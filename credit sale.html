@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Sales - KGL</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --primary-light: #4CAF50;
+            --danger-red: #DC3545;
+            --warning-orange: #FD7E14;
+            --info-blue: #0D6EFD;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, #1B5E20 0%, #2E7D32 100%);
+            color: white;
+            min-height: 100vh;
+            position: fixed;
+            width: 250px;
+            transition: all 0.3s;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid #FF9800;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s;
+        }
+
+        /* Header */
+        .page-header {
+            background: white;
+            border-bottom: 1px solid #dee2e6;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        /* Status Badges */
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .badge-pending {
+            background-color: rgba(253, 126, 20, 0.1);
+            color: #fd7e14;
+        }
+
+        .badge-partial {
+            background-color: rgba(13, 110, 253, 0.1);
+            color: #0d6efd;
+        }
+
+        .badge-paid {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .badge-overdue {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        /* Table */
+        .table-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            border-top: none;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table td {
+            vertical-align: middle;
+            padding: 16px 12px;
+        }
+
+        .table tr:hover {
+            background-color: #f8fff8;
+        }
+
+        /* Progress Bar */
+        .payment-progress {
+            height: 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .progress-low {
+            background: linear-gradient(90deg, #fd7e14, #ffc107);
+        }
+
+        .progress-medium {
+            background: linear-gradient(90deg, #0d6efd, #20c997);
+        }
+
+        .progress-high {
+            background: linear-gradient(90deg, #28a745, #4CAF50);
+        }
+
+        /* Action Buttons */
+        .btn-action {
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: 6px;
+            border: none;
+            transition: all 0.3s;
+            margin: 2px;
+        }
+
+        .btn-view {
+            background-color: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+        }
+
+        .btn-view:hover {
+            background-color: rgba(0, 123, 255, 0.2);
+        }
+
+        .btn-pay {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .btn-pay:hover {
+            background-color: rgba(40, 167, 69, 0.2);
+        }
+
+        .btn-remind {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .btn-remind:hover {
+            background-color: rgba(255, 193, 7, 0.2);
+        }
+
+        .btn-details {
+            background-color: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+        }
+
+        .btn-details:hover {
+            background-color: rgba(108, 117, 125, 0.2);
+        }
+
+        /* Buyer Card */
+        .buyer-card {
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .buyer-card:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
+        }
+
+        .buyer-card.selected {
+            border-color: var(--primary-green);
+            background: #f8fff8;
+        }
+
+        /* Form Styles */
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            height: 50px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            z-index: 10;
+        }
+
+        .input-with-icon .form-control,
+        .input-with-icon .form-select {
+            padding-left: 45px;
+        }
+
+        /* Payment Summary */
+        .payment-summary {
+            background: linear-gradient(135deg, #1B5E20, #2E7D32);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .btn-primary-green {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-light));
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary-green:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -250px;
+            }
+
+            .sidebar.active {
+                margin-left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .table-responsive {
+                font-size: 14px;
+            }
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary-green);
+            font-size: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        /* Tabs */
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 12px 20px;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-green);
+            border-bottom: 3px solid var(--primary-green);
+            background: transparent;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-green);
+            border: 2px solid white;
+        }
+
+        .timeline-item.payment::before {
+            background: #28a745;
+        }
+
+        .timeline-item.reminder::before {
+            background: #ffc107;
+        }
+
+        .timeline-item.overdue::before {
+            background: #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-brand p-3">
+            <div class="d-flex align-items-center">
+
+
+            </div>
+            <div>
+                <h5 class=>Karibu Groceries LTD</h5>
+
+            </div>
+        </div>
+        </div>
+
+        <div class="sidebar-nav mt-3">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">
+                        <i class= </i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="procurement.html">
+                         Procurement
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="sales.html">
+                        <i class="bi bi-cart-check me-3"></i> Sales
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="credit-sales.html">
+                        Credit Sales
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="inventory.html">
+                        <i class="bi bi-box-seam me-3"></i> Inventory
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="reports.html">
+                        <i class="bi bi-bar-chart me-3"></i> Reports
+                    </a>
+                </li>
+                <li class="nav-item mt-4">
+                    <a class="nav-link text-warning" href="#" id="logoutBtn">
+                        <i class="bi bi-box-arrow-left me-3"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <button class="menu-toggle me-3" id="menuToggle">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        <h4 class="mb-1 d-inline-block">
+                            <i class="bi bi-credit-card text-primary-green me-2"></i>
+                            Credit Sales Management
+                        </h4>
+                        <p class="text-muted mb-0" id="userInfo"></p>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge bg-primary-green">
+                            <i class="bi bi-clock me-1"></i>
+                            <span id="currentTime">Loading...</span>
+                        </span>
+                        <button class="btn btn-primary-green" data-bs-toggle="modal"
+                            data-bs-target="#newCreditSaleModal">
+                            New Credit Sale
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="container-fluid p-4">
+            <div class="row g-4 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h6 class="card-subtitle text-muted mb-1">TOTAL DUE</h6>
+                                    <h3 class="card-title fw-bold mb-0" id="totalDue">₵8.2M</h3>
+                                    <span class="text-muted small">from all credit sales</span>
+                                </div>
+                                <div class="stat-icon bg-primary">
+                                    <i class="bi bi-cash-coin"></i>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-success bg-opacity-10 text-success me-2">
+                                    <i class="bi bi-arrow-down me-1"></i> 5%
+                                </span>
+                                <span class="text-muted small">from last month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h6 class="card-subtitle text-muted mb-1">ACTIVE CREDITS</h6>
+                                    <h3 class="card-title fw-bold mb-0" id="activeCredits">23</h3>
+                                    <span class="text-muted small">customers with balance</span>
+                                </div>
+                                <div class="stat-icon bg-success">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-success bg-opacity-10 text-success me-2">
+                                    <i class="bi bi-plus-circle me-1"></i> 3 new
+                                </span>
+                                <span class="text-muted small">this month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h6 class="card-subtitle text-muted mb-1">OVERDUE AMOUNT</h6>
+                                    <h3 class="card-title fw-bold mb-0 text-danger" id="overdueAmount">₵1.5M</h3>
+                                    <span class="text-muted small">past due date</span>
+                                </div>
+                                <div class="stat-icon bg-danger">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-danger bg-opacity-10 text-danger me-2">
+                                    <i class="bi bi-exclamation-circle me-1"></i> 5 overdue
+                                </span>
+                                <span class="text-muted small">needs attention</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h6 class="card-subtitle text-muted mb-1">RECOVERY RATE</h6>
+                                    <h3 class="card-title fw-bold mb-0" id="recoveryRate">90%</h3>
+                                    <span class="text-muted small">of credit paid</span>
+                                </div>
+                                <div class="stat-icon bg-info">
+                                    <i class="bi bi-graph-up"></i>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-success bg-opacity-10 text-success me-2">
+                                    2%
+                                </span>
+                                <span class="text-muted small">improvement</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <ul class="nav nav-tabs" id="creditTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="all-tab" data-bs-toggle="tab"
+                                data-bs-target="#all-tab-pane">
+                                All Credits
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pending-tab" data-bs-toggle="tab"
+                                data-bs-target="#pending-tab-pane">
+
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="overdue-tab" data-bs-toggle="tab"
+                                data-bs-target="#overdue-tab-pane">
+
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="customers-tab" data-bs-toggle="tab"
+                                data-bs-target="#customers-tab-pane">
+                                <i class="bi bi-people me-2"></i> Customers
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Tabs Content -->
+            <div class="tab-content" id="creditTabsContent">
+                <!-- All Credits Tab -->
+                <div class="tab-pane fade show active" id="all-tab-pane">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <h5 class="card-title mb-0">
+
+                                            All Credit Sales
+                                        </h5>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-outline-primary-green btn-sm"
+                                                onclick="exportCreditReport()">
+                                                <i class="bi bi-download me-2"></i> Export
+                                            </button>
+                                            <div class="input-group" style="width: 250px;">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    id="searchCredits" placeholder="Search...">
+                                                <button class="btn btn-outline-secondary btn-sm">
+                                                    <i class="bi bi-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="creditsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th width="20%">CUSTOMER</th>
+                                                    <th width="15%">CREDIT ID</th>
+                                                    <th width="15%">AMOUNT DUE</th>
+                                                    <th width="15%">PAYMENT PROGRESS</th>
+                                                    <th width="15%">DUE DATE</th>
+                                                    <th width="10%">STATUS</th>
+                                                    <th width="10%">ACTIONS</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="creditsTableBody">
+                                                <!-- Credits will be loaded here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Tab -->
+                <div class="tab-pane fade" id="pending-tab-pane">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-card">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-4">
+
+                                        Pending Credit Sales
+                                    </h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>CUSTOMER</th>
+                                                    <th>AMOUNT DUE</th>
+                                                    <th>DAYS REMAINING</th>
+                                                    <th>CONTACT</th>
+                                                    <th>ACTIONS</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="pendingTableBody">
+                                                <!-- Pending credits will be loaded here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overdue Tab -->
+                <div class="tab-pane fade" id="overdue-tab-pane">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-card">
+                                <div class="card-body">
+                                    <div class="alert alert-danger mb-4">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        <strong>Attention Needed:</strong> The following credit sales are overdue.
+                                        Please contact customers immediately.
+                                    </div>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>CUSTOMER</th>
+                                                    <th>AMOUNT DUE</th>
+                                                    <th>DAYS OVERDUE</th>
+                                                    <th>CONTACT</th>
+                                                    <th>LAST CONTACT</th>
+                                                    <th>ACTIONS</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="overdueTableBody">
+                                                <!-- Overdue credits will be loaded here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers Tab -->
+                <div class="tab-pane fade" id="customers-tab-pane">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-people text-primary-green me-2"></i>
+                                            Credit Customers
+                                        </h5>
+                                        <button class="btn btn-primary-green btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#addCustomerModal">
+                                            <i class="bi bi-person-plus me-2"></i> Add Customer
+                                        </button>
+                                    </div>
+
+                                    <div class="row g-3" id="customersGrid">
+                                        <!-- Customer cards will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript -->
+    <script>
+        // Sample credit sales data
+        const creditSalesData = [
+            {
+                id: 'CR-001',
+                customerId: 1,
+                customerName: 'Supermarket UG',
+                nationalId: 'CM1234567890123',
+                location: 'Kampala Road',
+                contact: '0771234567',
+                amountDue: 2500000,
+                amountPaid: 1500000,
+                balance: 1000000,
+                totalAmount: 2500000,
+                salesAgent: 'Mary Attendant',
+                dueDate: '2024-04-10',
+                produceName: 'Beans',
+                produceType: 'Legumes',
+                tonnage: 1000,
+                dateDispatched: '2024-03-25',
+                branch: 'maganjo',
+                status: 'partially_paid',
+                paymentHistory: [
+                    { date: '2024-03-28', amount: 1000000, method: 'cash' },
+                    { date: '2024-04-01', amount: 500000, method: 'mobile' }
+                ],
+                reminders: [
+                    { date: '2024-04-05', type: 'sms', message: 'Reminder: Payment due in 5 days' }
+                ]
+            },
+            {
+                id: 'CR-002',
+                customerId: 2,
+                customerName: 'Restaurant Ltd',
+                nationalId: 'CM9876543210987',
+                location: 'Entebbe Road',
+                contact: '0787654321',
+                amountDue: 1800000,
+                amountPaid: 0,
+                balance: 1800000,
+                totalAmount: 1800000,
+                salesAgent: 'John Manager',
+                dueDate: '2024-03-28',
+                produceName: 'Grain Maize',
+                produceType: 'Cereals',
+                tonnage: 1000,
+                dateDispatched: '2024-03-20',
+                branch: 'maganjo',
+                status: 'overdue',
+                paymentHistory: [],
+                reminders: [
+                    { date: '2024-03-25', type: 'call', message: 'Reminder: Payment due in 3 days' },
+                    { date: '2024-03-29', type: 'sms', message: 'URGENT: Payment overdue' }
+                ]
+            },
+            {
+                id: 'CR-003',
+                customerId: 3,
+                customerName: 'Farmers Coop',
+                nationalId: 'CM4567890123456',
+                location: 'Jinja',
+                contact: '0751122334',
+                amountDue: 3200000,
+                amountPaid: 3200000,
+                balance: 0,
+                totalAmount: 3200000,
+                salesAgent: 'Mary Attendant',
+                dueDate: '2024-04-05',
+                produceName: 'G-nuts',
+                produceType: 'Legumes',
+                tonnage: 1000,
+                dateDispatched: '2024-03-22',
+                branch: 'maganjo',
+                status: 'paid',
+                paymentHistory: [
+                    { date: '2024-03-30', amount: 3200000, method: 'bank' }
+                ],
+                reminders: []
+            },
+            {
+                id: 'CR-004',
+                customerId: 4,
+                customerName: 'Hotel Paradise',
+                nationalId: 'CM7890123456789',
+                location: 'Mbarara',
+                contact: '0775566778',
+                amountDue: 1500000,
+                amountPaid: 750000,
+                balance: 750000,
+                totalAmount: 1500000,
+                salesAgent: 'Mary Attendant',
+                dueDate: '2024-04-15',
+                produceName: 'Cow peas',
+                produceType: 'Legumes',
+                tonnage: 500,
+                dateDispatched: '2024-03-28',
+                branch: 'maganjo',
+                status: 'partially_paid',
+                paymentHistory: [
+                    { date: '2024-03-29', amount: 750000, method: 'mobile' }
+                ],
+                reminders: []
+            },
+            {
+                id: 'CR-005',
+                customerId: 5,
+                customerName: 'School Catering',
+                nationalId: 'CM2345678901234',
+                location: 'Gulu',
+                contact: '0788899001',
+                amountDue: 2800000,
+                amountPaid: 0,
+                balance: 2800000,
+                totalAmount: 2800000,
+                salesAgent: 'John Manager',
+                dueDate: '2024-04-20',
+                produceName: 'Soybeans',
+                produceType: 'Legumes',
+                tonnage: 1000,
+                dateDispatched: '2024-03-25',
+                branch: 'maganjo',
+                status: 'pending',
+                paymentHistory: [],
+                reminders: []
+            }
+        ];
+
+        // Sample customers data
+        const customersData = [
+            {
+                id: 1,
+                name: 'Supermarket UG',
+                nationalId: 'CM1234567890123',
+                location: 'Kampala Road',
+                contact: '0771234567',
+                creditLimit: 5000000,
+                currentBalance: 1000000,
+                totalPurchases: 12500000,
+                creditScore: 'A',
+                status: 'active',
+                joinDate: '2023-01-15'
+            },
+            {
+                id: 2,
+                name: 'Restaurant Ltd',
+                nationalId: 'CM9876543210987',
+                location: 'Entebbe Road',
+                contact: '0787654321',
+                creditLimit: 3000000,
+                currentBalance: 1800000,
+                totalPurchases: 8500000,
+                creditScore: 'C',
+                status: 'overdue',
+                joinDate: '2023-03-20'
+            },
+            {
+                id: 3,
+                name: 'Farmers Coop',
+                nationalId: 'CM4567890123456',
+                location: 'Jinja',
+                contact: '0751122334',
+                creditLimit: 4000000,
+                currentBalance: 0,
+                totalPurchases: 9500000,
+                creditScore: 'A+',
+                status: 'paid',
+                joinDate: '2023-02-10'
+            },
+            {
+                id: 4,
+                name: 'Hotel Paradise',
+                nationalId: 'CM7890123456789',
+                location: 'Mbarara',
+                contact: '0775566778',
+                creditLimit: 2000000,
+                currentBalance: 750000,
+                totalPurchases: 5200000,
+                creditScore: 'B',
+                status: 'active',
+                joinDate: '2023-04-05'
+            },
+            {
+                id: 5,
+                name: 'School Catering',
+                nationalId: 'CM2345678901234',
+                location: 'Gulu',
+                contact: '0788899001',
+                creditLimit: 3000000,
+                currentBalance: 2800000,
+                totalPurchases: 6800000,
+                creditScore: 'B',
+                status: 'active',
+                joinDate: '2023-05-12'
+            }
+        ];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            loadUserInfo();
+            loadAllCredits();
+            loadPendingCredits();
+            loadOverdueCredits();
+            loadCustomers();
+            updateStats();
+            setupEventListeners();
+            updateTime();
+        });
+
+        function loadUserInfo() {
+            const username = localStorage.getItem('username') || 'User';
+            const branch = localStorage.getItem('userBranch') || 'Maganjo';
+
+            document.getElementById('sidebarBranch').textContent = branch + ' Branch';
+            document.getElementById('userInfo').textContent =
+                `User: ${username} • ${branch} Branch`;
+        }
+
+        function updateStats() {
+            const totalDue = creditSalesData.reduce((sum, credit) => sum + credit.balance, 0);
+            const activeCredits = creditSalesData.filter(credit => credit.balance > 0).length;
+            const overdueAmount = creditSalesData
+                .filter(credit => credit.status === 'overdue')
+                .reduce((sum, credit) => sum + credit.balance, 0);
+            const totalAmount = creditSalesData.reduce((sum, credit) => sum + credit.totalAmount, 0);
+            const paidAmount = totalAmount - totalDue;
+            const recoveryRate = totalAmount > 0 ? Math.round((paidAmount / totalAmount) * 100) : 0;
+
+            document.getElementById('totalDue').textContent = formatCurrency(totalDue);
+            document.getElementById('activeCredits').textContent = activeCredits;
+            document.getElementById('overdueAmount').textContent = formatCurrency(overdueAmount);
+            document.getElementById('recoveryRate').textContent = recoveryRate + '%';
+        }
+
+        function loadAllCredits() {
+            const tbody = document.getElementById('creditsTableBody');
+            tbody.innerHTML = '';
+
+            creditSalesData.forEach(credit => {
+                const progress = credit.totalAmount > 0 ?
+                    Math.round((credit.amountPaid / credit.totalAmount) * 100) : 0;
+                const progressClass = progress < 30 ? 'progress-low' :
+                    progress < 70 ? 'progress-medium' : 'progress-high';
+                const dueDate = new Date(credit.dueDate);
+                const today = new Date();
+                const daysDiff = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+
+                let statusBadge = '';
+                let statusClass = '';
+
+                switch (credit.status) {
+                    case 'pending':
+                        statusBadge = '<span class="badge-status badge-pending"><i class="bi bi-clock me-1"></i> Pending</span>';
+                        break;
+                    case 'partially_paid':
+                        statusBadge = '<span class="badge-status badge-partial"><i class="bi bi-arrow-left-right me-1"></i> Partially Paid</span>';
+                        break;
+                    case 'paid':
+                        statusBadge = '<span class="badge-status badge-paid"><i class="bi bi-check-circle me-1"></i> Paid</span>';
+                        break;
+                    case 'overdue':
+                        statusBadge = '<span class="badge-status badge-overdue"><i class="bi bi-exclamation-triangle me-1"></i> Overdue</span>';
+                        break;
+                }
+
+                const row = `
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">${credit.customerName}</div>
+                            <small class="text-muted">${credit.contact}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark">${credit.id}</span>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-primary-green">${formatCurrency(credit.balance)}</div>
+                            <small class="text-muted">Total: ${formatCurrency(credit.totalAmount)}</small>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="fw-semibold me-2">${progress}%</div>
+                                <small class="text-muted">${formatCurrency(credit.amountPaid)} paid</small>
+                            </div>
+                            <div class="payment-progress">
+                                <div class="progress-fill ${progressClass}" style="width: ${progress}%"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold">${formatDate(credit.dueDate)}</div>
+                            <small class="${daysDiff < 0 ? 'text-danger' : 'text-muted'}">
+                                ${daysDiff < 0 ? `${Math.abs(daysDiff)} days overdue` : `${daysDiff} days left`}
+                            </small>
+                        </td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-action btn-pay" data-id="${credit.id}" title="Record Payment">
+                                    <i class="bi bi-cash"></i>
+                                </button>
+                                <button class="btn btn-action btn-remind" data-id="${credit.id}" title="Send Reminder">
+                                    <i class="bi bi-bell"></i>
+                                </button>
+                                <button class="btn btn-action btn-view" data-id="${credit.id}" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+
+                tbody.innerHTML += row;
+            });
+        }
+
+        function loadPendingCredits() { }
+        const tbody = document.getElementById('pendingTableBody');
+        tbody.innerHTML = '';
+
+        const pendingCredits = creditSalesData.filter(credit =>
+            credit.status === 'pending' || credit.status === 'partially_paid'
+        );
+
+        if (pendingCredits.length === 0) {
+            tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            <i class="bi bi-check-circle fs-1 mb-3 d-block"></i>
+                            <p class="mb-0">No pending credit sales</p>
+                            <small>All credit sales are either paid or overdue</small>
+                        </td>
+                    </tr>
+                `;
+            return;
+        }
+
+        pendingCredits.forEach(credit => {
+            const dueDate = new Date(credit.dueDate);
+            const today = new Date();
+            const daysRemaining = Math.ceil((dueDate - today) / (100 creditSalesData.filter(credit =>
+                credit.status === 'pending' || credit.status === 'partially_paid'
+            );
+
+            if (pendingCredits.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            <i class="bi bi-check-circle fs-1 mb-3 d-block"></i>
+                            <p class="mb-0">No pending credit sales</p>
+                            <small>All credit sales are either paid or overdue</small>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            pendingCredits.forEach(credit => {
+                const dueDate = new Date(credit.dueDate);
+                const today = new Date();
+                const daysRemaining = Math.ceil((dueDate - today) / (1000 * 60 * 0 * 60 * 60 * 24));
+
+                const row = `
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">${credit.customerName}</div>
+                            <small class="text-muted">Credit ID: ${credit.id60 * 24))};
+
+        const row = `
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">${credit.customerName}</div>
+                            <small class="text-muted">Credit ID: ${credit.id}</small>
+                        </td}</small>
+                        </td>
+                        <td class="fw-bold text-primary-green">${formatCurrency(credit.balance)}</td>
+                        <td>
+                            <span class="badge ${daysRemaining < 3 ? 'bg-warning' : 'bg-info'}">
+                                ${daysRemaining} days
+                            </span>
+                        </td>
+                        <td>${credit.contact}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary-green me-2" onclick="sendReminder('${credit.id}')">
+                                <i class="bi bi-bell me-1"></i> Remind
+                            </button>
+                            <button class="btn btn-sm btn-primary-green" onclick="recordPayment('${credit.id}')">
+                                <i class="bi bi-cash me-1"></i> Pay
+                            </button>
+                        </td>
+                    </tr>
+                `;
+
+        tbody.innerHTML += row;
+            });
+        }
+
+        function loadOverdueCredits() {
+            const tbody = document.getElementById('overdueTableBody');
+            tbody.innerHTML = '';
+
+            const overdueCredits = creditSalesData.filter(credit => credit.status === 'overdue');
+
+            if (overdueCredits.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6>
+                        <td class="fw-bold text-primary-green">${formatCurrency(credit.balance)}</td>
+                        <td>
+                            <span class="badge ${daysRemaining < 3 ? 'bg-warning' : 'bg-info'}">
+                                ${daysRemaining} days
+                            </span>
+                        </td>
+                        <td>${credit.contact}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary-green me-2" onclick="sendReminder('${credit.id}')">
+                                <i class="bi bi-bell me-1"></i> Remind
+                            </button>
+                            <button class="btn btn-sm btn-primary-green" onclick="recordPayment('${credit.id}')">
+                                <i class="bi bi-cash me-1"></i> Pay
+                            </button>
+                        </td>
+                    </tr>
+                `;
+
+                tbody.innerHTML += row;
+            }
+        }
+
+        function loadOverdueCredits() {
+            const tbody = document.getElementById('overdueTableBody');
+            tbody.innerHTML = '';
+
+            const overdueCredits = creditSalesData.filter(credit => credit.status === 'overdue');
+
+            if (overdueCredits.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center p

@@ -7,7 +7,8 @@ const authRoutes = require("./routes/auth.routes");
 const usersRoutes = require("./routes/users.routes");
 const productsRoutes = require("./routes/products.routes");
 const salesRoutes = require("./routes/sales.routes");
-
+const paymentsRoutes = require("./routes/payments.routes");
+const reportsRoutes = require("./routes/reports.routes");
 
 const app = express();
 app.use(cors());
@@ -19,9 +20,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/products", productsRoutes);
 app.use("/api/sales", salesRoutes);
-
-
-
+app.use("/api", paymentsRoutes);
+app.use("/api/reports", reportsRoutes);
 
 const port = process.env.PORT || 3000;
 

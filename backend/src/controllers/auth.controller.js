@@ -39,8 +39,12 @@ async function login(req, res) {
 }
 
 async function me(req, res) {
-  // req.user comes from requireAuth middleware
   return res.json({ user: req.user });
 }
 
-module.exports = { login, me };
+async function logout(req, res) {
+  // JWT is stateless; logout is handled on the client by deleting the token
+  return res.json({ message: "Logged out" });
+}
+
+module.exports = { login, me, logout };

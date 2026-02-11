@@ -1,0 +1,163 @@
+:root{
+  --bs-primary: #2f9e44;
+  --bs-primary-rgb: 47, 158, 68;
+
+  --bs-focus-ring-color: rgba(47, 158, 68, 0.25);
+}
+
+body { background: #f7f7fb; }
+
+.list-group-item.active {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.kgl-panel .card { border-radius: 14px; }
+
+.navbar-brand { letter-spacing: 0.2px; }
+
+/* =========================
+   KGL Glass Login Layout
+   ========================= */
+
+.kgl-login {
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background: #f7f7fb;
+}
+
+.kgl-login-bg{
+  position: absolute;
+  inset: 0;
+  background: url("../assets/login-bg.jpg") center/cover no-repeat;
+  transform: scale(1.03);
+  filter: saturate(1.05);
+}
+
+.kgl-login-overlay{
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 35%),
+              radial-gradient(circle at 70% 80%, rgba(255,255,255,0.06), transparent 40%),
+              rgba(0,0,0,0.45);
+}
+
+.kgl-glass-frame{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(980px, 92vw);
+  height: min(520px, 72vh);
+  transform: translate(-50%, -50%);
+  border-radius: 26px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.16);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 22px 60px rgba(0,0,0,0.25);
+}
+
+
+.kgl-shape{
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+}
+
+.kgl-shape-1{
+  width: 140px; height: 140px;
+  left: 12%;
+  top: 20%;
+}
+
+.kgl-shape-2{
+  width: 210px; height: 210px;
+  right: 10%;
+  top: 18%;
+  border-radius: 42px;
+}
+
+.kgl-shape-3{
+  width: 260px; height: 120px;
+  right: 14%;
+  bottom: 14%;
+  border-radius: 999px;
+  opacity: 0.9;
+}
+
+/* Center the card */
+.kgl-login-wrap{
+  position: relative;
+  z-index: 5;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+/* Glass login card */
+.kgl-login-card{
+  width: 100%;
+  max-width: 420px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.20);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 18px 55px rgba(0,0,0,0.25);
+}
+
+.kgl-login-card-inner{
+  padding: 26px 24px;
+}
+
+.kgl-logo-badge{
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: var(--bs-primary);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+/* Inputs tuned for glass UI */
+.kgl-input{
+  background: rgba(255,255,255,0.90);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 12px;
+}
+
+.kgl-input:focus{
+  border-color: rgba(var(--bs-primary-rgb), 0.65);
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.20);
+}
+
+.kgl-btn{
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 600;
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  
+  /* Hover States */
+  --bs-btn-hover-bg: #2b8a3e; /* A slightly darker shade */
+  --bs-btn-hover-border-color: #2b8a3e;
+  
+  /* Active/Pressed States */
+  --bs-btn-active-bg: #237032;
+  --bs-btn-active-border-color: #237032;
+  
+  /* Ensure text remains white */
+  --bs-btn-color: #fff;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-color: #fff;
+}

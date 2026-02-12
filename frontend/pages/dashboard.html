@@ -31,15 +31,10 @@
       <aside class="col-12 col-lg-2 border-end bg-light min-vh-100 p-3">
         <div class="list-group small" id="menu">
           <a class="list-group-item list-group-item-action active" href="#" data-page="home">Dashboard</a>
-
           <a class="list-group-item list-group-item-action" href="#" data-page="products">Products</a>
-
           <a class="list-group-item list-group-item-action" href="#" data-page="sales">Sales</a>
           <a class="list-group-item list-group-item-action" href="#" data-page="payments">Credit Payments</a>
-
           <a class="list-group-item list-group-item-action d-none" href="#" data-page="users" data-role="manager">User Management</a>
-          <a class="list-group-item list-group-item-action d-none" href="#" data-page="manage-products" data-role="manager">Manage Products</a>
-
           <a class="list-group-item list-group-item-action d-none" href="#" data-page="reports" data-role="director,manager">Reports</a>
         </div>
       </aside>
@@ -94,66 +89,394 @@
 
           <div class="mt-4">
             <div class="alert alert-light border">
-              Next: we’ll wire Products/Sales/Reports pages to real API calls.
             </div>
           </div>
         </section>
 
         <section id="panel-products" class="kgl-panel d-none">
-          <div class="card border-0 shadow-sm">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="fw-semibold">Products</div>
-                <button class="btn btn-sm btn-outline-primary" id="btnLoadProducts">Refresh</button>
+    <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+      <div>
+        <div class="fw-semibold">Products</div>
+        <div class="text-muted small">Manage stock items and pricing</div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <input id="productSearch" class="form-control form-control-sm" style="width: 220px;"
+              placeholder="Search products..." />
+        <button class="btn btn-sm btn-outline-primary" id="btnLoadProducts">Refresh</button>
+        <button class="btn btn-sm btn-primary d-none" id="btnShowAddProduct" data-role="manager">Add Product</button>
+      </div>
+    </div>
+
+    <!-- LIST -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-3">Name</th>
+                <th>Category</th>
+                <th>Unit</th>
+                <th class="text-end">Selling</th>
+                <th class="text-end">Stock</th>
+                <th class="text-end pe-3">Action</th>
+              </tr>
+            </thead>
+            <tbody id="productsTable">
+              <tr><td colspan="6" class="text-muted ps-3 py-4">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD FORM (manager only) -->
+    <div class="card border-0 shadow-sm d-none" id="addProductCard" data-role="manager">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div class="fw-semibold">Add Product</div>
+          <button class="btn btn-sm btn-outline-secondary" id="btnCloseAddProduct">Close</button>
+        </div>
+
+        <form id="addProductForm" class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small">Name</label>
+            <input class="form-control" id="pName" required />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label small">Category</label>
+            <input class="form-control" id="pCategory" required />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small">Unit</label>
+            <input class="form-control" id="pUnit" placeholder="e.g. kg, pcs" required />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small">Buying Price</label>
+            <input class="form-control" id="pBuyingPrice" type="number" min="0" step="1" required />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small">Selling Price</label>
+            <input class="form-control" id="pSellingPrice" type="number" min="0" step="1" required />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small">Initial Stock Qty</label>
+            <input class="form-control" id="pStockQty" type="number" min="0" step="1" required />
+          </div>
+
+          <div class="col-12">
+            <button class="btn btn-primary" type="submit" id="btnCreateProduct">Create Product</button>
+            <span class="text-muted small ms-2" id="addProductHint"></span>
+          </div>
+
+          <div class="col-12">
+            <div class="alert alert-danger d-none mb-0" id="addProductError"></div>
+            <div class="alert alert-success d-none mb-0" id="addProductSuccess"></div>
+          </div>
+        </form>
+      </div>
+    </div>
+        </section>
+        <!-- Product Details Modal -->
+        <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+              <div class="modal-header">
+                <div>
+                  <h5 class="modal-title mb-0" id="pmTitle">Product</h5>
+                  <div class="text-muted small" id="pmSub">—</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
 
-              <div class="table-responsive">
-                <table class="table table-sm align-middle">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Category</th>
-                      <th>Unit</th>
-                      <th class="text-end">Price</th>
-                      <th class="text-end">Stock</th>
-                    </tr>
-                  </thead>
-                  <tbody id="productsTable">
-                    <tr><td colspan="5" class="text-muted">Click Refresh to load products.</td></tr>
-                  </tbody>
-                </table>
+              <div class="modal-body">
+                <form id="productEditForm" class="row g-3">
+                  <input type="hidden" id="pmId" />
+
+                  <div class="col-md-6">
+                    <label class="form-label small">Name</label>
+                    <input class="form-control" id="pmName" required />
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small">Category</label>
+                    <input class="form-control" id="pmCategory" required />
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label small">Unit</label>
+                    <input class="form-control" id="pmUnit" required />
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label small">Buying Price</label>
+                    <input class="form-control" id="pmBuyingPrice" type="number" min="0" step="1" required />
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label small">Selling Price</label>
+                    <input class="form-control" id="pmSellingPrice" type="number" min="0" step="1" required />
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label small">Stock Qty</label>
+                    <input class="form-control" id="pmStockQty" type="number" min="0" step="1" required />
+                  </div>
+
+                  <div class="col-md-8">
+                    <label class="form-label small">Status</label>
+                    <select class="form-select" id="pmIsActive">
+                      <option value="true">Active</option>
+                      <option value="false">Inactive</option>
+                    </select>
+                  </div>
+
+                  <div class="col-12">
+                    <div class="alert alert-danger d-none mb-0" id="pmError"></div>
+                    <div class="alert alert-success d-none mb-0" id="pmSuccess"></div>
+                  </div>
+                </form>
+              </div>
+
+              <div class="modal-footer">
+                <div class="me-auto text-muted small" id="pmMeta">—</div>
+
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+
+                <!-- Manager-only -->
+                <button type="button" class="btn btn-primary d-none" id="pmSaveBtn" data-role="manager">
+                  Save changes
+                </button>
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
         <section id="panel-reports" class="kgl-panel d-none">
           <div class="alert alert-info border-0">
-            Reports UI comes next (Summary, Stock, Sales by Agent).
           </div>
         </section>
 
         <section id="panel-sales" class="kgl-panel d-none">
-          <div class="alert alert-info border-0">
-            Sales UI comes next (Record Sale + Sales list).
-          </div>
-        </section>
 
+  <div class="row g-3">
+    <!-- Left: Build Cart -->
+    <div class="col-12 col-lg-7">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div>
+              <div class="fw-semibold">Record Sale</div>
+              <div class="text-muted small">Add items, choose cash/credit, submit</div>
+            </div>
+            <button class="btn btn-sm btn-outline-primary" id="btnReloadSaleProducts">
+              Reload products
+            </button>
+          </div>
+
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-md-7">
+              <label class="form-label small mb-1">Product</label>
+              <select id="saleProduct" class="form-select">
+                <option value="">Loading products...</option>
+              </select>
+              <div class="text-muted small mt-1" id="saleProductMeta">—</div>
+            </div>
+
+            <div class="col-6 col-md-3">
+              <label class="form-label small mb-1">Qty</label>
+              <input id="saleQty" type="number" class="form-control" min="1" step="1" value="1" />
+            </div>
+
+            <div class="col-6 col-md-2 d-grid">
+              <button class="btn btn-primary" id="btnAddToCart">Add</button>
+            </div>
+          </div>
+
+          <hr class="my-3" />
+
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Item</th>
+                  <th class="text-end">Price</th>
+                  <th class="text-end">Qty</th>
+                  <th class="text-end">Total</th>
+                  <th class="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody id="cartTable">
+                <tr><td colspan="5" class="text-muted py-4">Cart is empty.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <button class="btn btn-outline-danger btn-sm" id="btnClearCart">Clear cart</button>
+            <div class="fw-bold fs-5">
+              Total: UGX <span id="cartTotal">0</span>
+            </div>
+          </div>
+
+          <div class="alert alert-danger d-none mt-3 mb-0" id="saleError"></div>
+          <div class="alert alert-success d-none mt-3 mb-0" id="saleSuccess"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Payment -->
+    <div class="col-12 col-lg-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="fw-semibold mb-2">Payment</div>
+
+          <label class="form-label small mb-1">Sale type</label>
+          <div class="btn-group w-100 mb-3" role="group" aria-label="Sale type">
+            <input type="radio" class="btn-check" name="saleType" id="saleCash" autocomplete="off" checked>
+            <label class="btn btn-outline-primary" for="saleCash">Cash</label>
+
+            <input type="radio" class="btn-check" name="saleType" id="saleCredit" autocomplete="off">
+            <label class="btn btn-outline-primary" for="saleCredit">Credit</label>
+          </div>
+
+          <div id="creditFields" class="d-none">
+            <div class="mb-2">
+              <label class="form-label small mb-1">Customer name</label>
+              <input id="customerName" class="form-control" placeholder="e.g. John Kato" />
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label small mb-1">Customer phone</label>
+              <input id="customerPhone" class="form-control" placeholder="e.g. 0700..." />
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label small mb-1">Amount paid now (UGX)</label>
+              <input id="amountPaidNow" type="number" class="form-control" min="0" step="1" value="0" />
+            </div>
+
+            <div class="text-muted small">
+              Balance: UGX <span class="fw-semibold" id="creditBalance">0</span>
+            </div>
+
+            <hr class="my-3" />
+          </div>
+
+          <button class="btn btn-primary w-100" id="btnSubmitSale">
+            Submit Sale
+          </button>
+
+          <div class="text-muted small mt-2">
+            Tip: Stock reduces automatically after successful sale.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+        </section>
+        <!-- Receipt Modal -->
+        <div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+              <div class="modal-header">
+                <div>
+                  <h5 class="modal-title mb-0">Receipt</h5>
+                  <div class="text-muted small" id="rcSub">—</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+
+              <div class="modal-body" id="receiptArea">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <div class="fw-bold fs-5">Karibu Groceries Ltd</div>
+                    <div class="text-muted small">Sales Receipt</div>
+                  </div>
+                  <div class="text-end small">
+                    <div><span class="text-muted">Sale ID:</span> <span class="fw-semibold" id="rcId">—</span></div>
+                    <div><span class="text-muted">Date:</span> <span id="rcDate">—</span></div>
+                  </div>
+                </div>
+
+                <div class="row g-2 small mb-3">
+                  <div class="col-12 col-md-6">
+                    <div><span class="text-muted">Sold by:</span> <span id="rcSoldBy">—</span></div>
+                    <div><span class="text-muted">Sale type:</span> <span id="rcType">—</span></div>
+                    <div><span class="text-muted">Status:</span> <span class="badge" id="rcStatus">—</span></div>
+                  </div>
+                  <div class="col-12 col-md-6" id="rcCustomerBox" style="display:none;">
+                    <div class="fw-semibold mb-1">Customer</div>
+                    <div><span class="text-muted">Name:</span> <span id="rcCustName">—</span></div>
+                    <div><span class="text-muted">Phone:</span> <span id="rcCustPhone">—</span></div>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Item</th>
+                        <th class="text-end">Price</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody id="rcItems">
+                      <tr><td colspan="4" class="text-muted">—</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                  <div style="min-width: 280px;">
+                    <div class="d-flex justify-content-between">
+                      <span class="text-muted">Total</span>
+                      <span class="fw-semibold">UGX <span id="rcTotal">0</span></span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <span class="text-muted">Paid</span>
+                      <span>UGX <span id="rcPaid">0</span></span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <span class="text-muted">Balance</span>
+                      <span>UGX <span id="rcBalance">0</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="my-3" />
+                <div class="text-center text-muted small">
+                  Thank you for shopping with us.
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" id="btnPrintReceipt">Print</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <section id="panel-payments" class="kgl-panel d-none">
           <div class="alert alert-info border-0">
-            Credit Payments UI comes next (search sale, add payment, list payments).
           </div>
         </section>
 
         <section id="panel-users" class="kgl-panel d-none">
           <div class="alert alert-info border-0">
-            User Management UI comes next (manager only).
           </div>
         </section>
 
         <section id="panel-manage-products" class="kgl-panel d-none">
           <div class="alert alert-info border-0">
-            Manage Products UI comes next (create/update/stock).
           </div>
         </section>
 
@@ -164,5 +487,7 @@
   <script src="../vendor/bootstrap/bootstrap.bundle.min.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/dashboard.js"></script>
+  <script src="../js/products.js"></script>
+  <script src="../js/sales.js"></script>
 </body>
 </html>

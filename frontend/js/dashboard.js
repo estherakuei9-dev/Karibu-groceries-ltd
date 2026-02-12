@@ -41,14 +41,11 @@
     document.getElementById(`panel-${key}`).classList.remove("d-none");
 
     if (key === "products") {
-    if (!productsLoadedOnce) {
-        productsLoadedOnce = true;
-        loadProducts();
-    } else {
-        loadProducts();
+    window.KGLProducts?.load();
     }
+    if (key === "sales") {
+    window.KGLSales?.init();
     }
-
 
     const map = {
       home: ["Dashboard", "Quick overview"],

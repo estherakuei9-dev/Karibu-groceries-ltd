@@ -109,8 +109,11 @@ const receiptArea = document.getElementById("receiptArea");
     rcBalance.textContent = money(sale.balance);
 
     receiptModal?.show();
-    }
 
+    }
+    window.KGLReceipt = {
+     open: openReceipt
+    };
     btnPrintReceipt?.addEventListener("click", () => {
   if (!receiptArea) return;
 

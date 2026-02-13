@@ -46,7 +46,10 @@
     if (key === "sales") {
     window.KGLSales?.init();
     }
-
+    if (key === "sales") {
+    window.KGLSales?.init?.();
+    window.KGLSalesList?.load?.();
+    }
     const map = {
       home: ["Dashboard", "Quick overview"],
       products: ["Products", "View available items"],

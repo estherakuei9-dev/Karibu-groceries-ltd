@@ -381,6 +381,52 @@
     </div>
 
   </div>
+  <hr class="my-4" />
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-2">
+        <div>
+          <div class="fw-semibold">Sales List</div>
+          <div class="text-muted small">View and filter recorded sales</div>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <select id="salesFilterType" class="form-select form-select-sm" style="width: 140px;">
+            <option value="">All</option>
+            <option value="cash">Cash</option>
+            <option value="credit">Credit</option>
+          </select>
+
+          <input id="salesFilterFrom" type="date" class="form-control form-control-sm" style="width: 160px;" />
+          <input id="salesFilterTo" type="date" class="form-control form-control-sm" style="width: 160px;" />
+
+          <button class="btn btn-sm btn-outline-primary" id="btnLoadSalesList">Refresh</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-3">Date</th>
+              <th>Type</th>
+              <th>Customer</th>
+              <th>Sold By</th>
+              <th class="text-end">Total</th>
+              <th class="text-end">Balance</th>
+              <th class="text-end pe-3">Action</th>
+            </tr>
+          </thead>
+          <tbody id="salesListTable">
+            <tr><td colspan="7" class="text-muted ps-3 py-4">Click refresh to load sales.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="alert alert-danger d-none mt-3 mb-0" id="salesListError"></div>
+    </div>
+  </div>
         </section>
         <!-- Receipt Modal -->
         <div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true">
@@ -465,6 +511,78 @@
             </div>
           </div>
         </div>
+        <!-- View Sale Modal -->
+<div class="modal fade" id="saleViewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title mb-0">Sale Details</h5>
+          <div class="text-muted small" id="svSub">—</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-2 small mb-3">
+          <div class="col-12 col-md-6">
+            <div><span class="text-muted">Sale ID:</span> <span class="fw-semibold" id="svId">—</span></div>
+            <div><span class="text-muted">Date:</span> <span id="svDate">—</span></div>
+            <div><span class="text-muted">Sold by:</span> <span id="svSoldBy">—</span></div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div><span class="text-muted">Type:</span> <span id="svType">—</span></div>
+            <div><span class="text-muted">Status:</span> <span class="badge" id="svStatus">—</span></div>
+            <div id="svCustomerLine" style="display:none;">
+              <span class="text-muted">Customer:</span> <span id="svCustomer">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Item</th>
+                <th class="text-end">Price</th>
+                <th class="text-end">Qty</th>
+                <th class="text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody id="svItems">
+              <tr><td colspan="4" class="text-muted">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <div style="min-width: 280px;">
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">Total</span>
+              <span class="fw-semibold">UGX <span id="svTotal">0</span></span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">Paid</span>
+              <span>UGX <span id="svPaid">0</span></span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">Balance</span>
+              <span>UGX <span id="svBalance">0</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-danger d-none mt-3 mb-0" id="svError"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-primary" id="btnOpenReceiptFromSale">Open Receipt</button>
+      </div>
+    </div>
+  </div>
+</div>
         <section id="panel-payments" class="kgl-panel d-none">
           <div class="alert alert-info border-0">
           </div>
@@ -489,5 +607,6 @@
   <script src="../js/dashboard.js"></script>
   <script src="../js/products.js"></script>
   <script src="../js/sales.js"></script>
+  <script src="../js/sales_list.js"></script>
 </body>
 </html>

@@ -257,22 +257,28 @@ pmSaveBtn?.addEventListener("click", async () => {
 
   const id = pmId.value;
 
-  const payload = {
-    name: pmName.value.trim(),
-    category: pmCategory.value.trim(),
-    unit: pmUnit.value.trim(),
-    buyingPrice: Number(pmBuyingPrice.value),
-    sellingPrice: Number(pmSellingPrice.value),
-    stockQty: Number(pmStockQty.value),
-    isActive: pmIsActive.value === "true",
-  };
+  const Payload = {
+  name: pmName.value.trim(),
+  category: pmCategory.value.trim(),
+  unit: pmUnit.value.trim(),
+  buyingPrice: Number(pmBuyingPrice.value),
+  sellingPrice: Number(pmSellingPrice.value),
+  isActive: pmIsActive.value === "true",
+    };
+
+    const stockValue = Number(pmStockQty.value);
 
   try {
     try {
       await window.KGL.api(`/api/products/${id}`, {
         method: "PATCH",
-        body: JSON.stringify(payload),
+        body: JSON.stringify(Payload),
       });
+      
+        await window.KGL.api(`/api/products/${id}/stock`, {
+        method: "PATCH",
+        body: JSON.stringify({ set: stockValue }),
+        });
     } catch (err) {
       if (err.status === 404 || err.status === 405) {
         await window.KGL.api(`/api/products/${id}`, {

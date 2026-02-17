@@ -258,10 +258,130 @@
           </div>
         </div>
 
-        <section id="panel-reports" class="kgl-panel d-none">
-          <div class="alert alert-info border-0">
+    <section id="panel-reports" class="kgl-panel d-none">
+      <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+        <div>
+          <div class="fw-semibold">Reports</div>
+          <div class="text-muted small">Summary, Stock, and Sales by Agent</div>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+          <input id="repFrom" type="date" class="form-control form-control-sm" style="width: 160px;" />
+          <input id="repTo" type="date" class="form-control form-control-sm" style="width: 160px;" />
+          <button class="btn btn-sm btn-outline-primary" id="btnLoadReports">Refresh</button>
+        </div>
+      </div>
+
+  <!-- Summary cards -->
+      <div class="row g-3">
+        <div class="col-12 col-md-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="text-muted small">Total Sales</div>
+              <div class="fw-bold fs-4">UGX <span id="repTotalSales">0</span></div>
+              <div class="small text-muted">Count: <span id="repSalesCount">0</span></div>
+            </div>
           </div>
-        </section>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="text-muted small">Total Paid</div>
+              <div class="fw-bold fs-4">UGX <span id="repTotalPaid">0</span></div>
+              <div class="small text-muted">Balance: UGX <span id="repTotalBalance">0</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="text-muted small">Cash vs Credit</div>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <div class="small text-muted">Cash</div>
+                  <div class="fw-semibold">UGX <span id="repCashSales">0</span></div>
+                </div>
+                <div class="text-end">
+                  <div class="small text-muted">Credit</div>
+                  <div class="fw-semibold">UGX <span id="repCreditSales">0</span></div>
+                </div>
+              </div>
+              <div class="small text-muted mt-1">
+                Cash: <span id="repCashCount">0</span> • Credit: <span id="repCreditCount">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  <!-- Stock report -->
+      <div class="card border-0 shadow-sm mt-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <div class="fw-semibold">Stock Report</div>
+              <div class="text-muted small">Current inventory levels</div>
+            </div>
+            <div class="small text-muted">
+              Items: <span id="repStockItems">0</span> • Total Qty: <span id="repStockQty">0</span>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Unit</th>
+                  <th class="text-end">Stock</th>
+                  <th class="text-end">Buy</th>
+                  <th class="text-end">Sell</th>
+                </tr>
+              </thead>
+              <tbody id="repStockTable">
+                <tr><td colspan="6" class="text-muted py-3">Load reports to see stock.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+  <!-- Sales by agent -->
+      <div class="card border-0 shadow-sm mt-3">
+        <div class="card-body">
+          <div class="fw-semibold mb-2">Sales by Agent</div>
+
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Agent</th>
+                  <th class="text-end">Sales Count</th>
+                  <th class="text-end">Total Sales</th>
+                  <th class="text-end">Total Paid</th>
+                  <th class="text-end">Balance</th>
+                  <th class="text-end">Cash</th>
+                  <th class="text-end">Credit</th>
+                </tr>
+              </thead>
+              <tbody id="repAgentTable">
+                <tr><td colspan="7" class="text-muted py-3">Load reports to see agents.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="small text-muted mt-2">
+            Tip: Use the date range to filter the report period.
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-danger d-none mt-3 mb-0" id="repError"></div>
+    </section>
+
 
         <section id="panel-sales" class="kgl-panel d-none">
 
@@ -512,86 +632,283 @@
           </div>
         </div>
         <!-- View Sale Modal -->
-<div class="modal fade" id="saleViewModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content border-0 shadow">
-      <div class="modal-header">
-        <div>
-          <h5 class="modal-title mb-0">Sale Details</h5>
-          <div class="text-muted small" id="svSub">—</div>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
+        <div class="modal fade" id="saleViewModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+              <div class="modal-header">
+                <div>
+                  <h5 class="modal-title mb-0">Sale Details</h5>
+                  <div class="text-muted small" id="svSub">—</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
 
-      <div class="modal-body">
-        <div class="row g-2 small mb-3">
-          <div class="col-12 col-md-6">
-            <div><span class="text-muted">Sale ID:</span> <span class="fw-semibold" id="svId">—</span></div>
-            <div><span class="text-muted">Date:</span> <span id="svDate">—</span></div>
-            <div><span class="text-muted">Sold by:</span> <span id="svSoldBy">—</span></div>
-          </div>
+              <div class="modal-body">
+                <div class="row g-2 small mb-3">
+                  <div class="col-12 col-md-6">
+                    <div><span class="text-muted">Sale ID:</span> <span class="fw-semibold" id="svId">—</span></div>
+                    <div><span class="text-muted">Date:</span> <span id="svDate">—</span></div>
+                    <div><span class="text-muted">Sold by:</span> <span id="svSoldBy">—</span></div>
+                  </div>
 
-          <div class="col-12 col-md-6">
-            <div><span class="text-muted">Type:</span> <span id="svType">—</span></div>
-            <div><span class="text-muted">Status:</span> <span class="badge" id="svStatus">—</span></div>
-            <div id="svCustomerLine" style="display:none;">
-              <span class="text-muted">Customer:</span> <span id="svCustomer">—</span>
+                  <div class="col-12 col-md-6">
+                    <div><span class="text-muted">Type:</span> <span id="svType">—</span></div>
+                    <div><span class="text-muted">Status:</span> <span class="badge" id="svStatus">—</span></div>
+                    <div id="svCustomerLine" style="display:none;">
+                      <span class="text-muted">Customer:</span> <span id="svCustomer">—</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Item</th>
+                        <th class="text-end">Price</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody id="svItems">
+                      <tr><td colspan="4" class="text-muted">—</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                  <div style="min-width: 280px;">
+                    <div class="d-flex justify-content-between">
+                      <span class="text-muted">Total</span>
+                      <span class="fw-semibold">UGX <span id="svTotal">0</span></span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <span class="text-muted">Paid</span>
+                      <span>UGX <span id="svPaid">0</span></span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                      <span class="text-muted">Balance</span>
+                      <span>UGX <span id="svBalance">0</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="alert alert-danger d-none mt-3 mb-0" id="svError"></div>
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" id="btnOpenReceiptFromSale">Open Receipt</button>
+              </div>
             </div>
           </div>
         </div>
+        <!-- Credit Payment Modal -->
+        <div class="modal fade" id="creditPayModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+              <div class="modal-header">
+                <div>
+                  <h5 class="modal-title mb-0">Receive Payment</h5>
+                  <div class="text-muted small" id="cpModalSub">—</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
 
-        <div class="table-responsive">
-          <table class="table table-sm align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>Item</th>
-                <th class="text-end">Price</th>
-                <th class="text-end">Qty</th>
-                <th class="text-end">Total</th>
-              </tr>
-            </thead>
-            <tbody id="svItems">
-              <tr><td colspan="4" class="text-muted">—</td></tr>
-            </tbody>
-          </table>
+              <div class="modal-body">
+                <input type="hidden" id="cpSaleId" />
+
+                <div class="row g-2 small mb-3">
+                  <div class="col-12 col-md-6">
+                    <div><span class="text-muted">Customer:</span> <span class="fw-semibold" id="cpCustomer">—</span></div>
+                    <div><span class="text-muted">Phone:</span> <span id="cpPhone">—</span></div>
+                    <div><span class="text-muted">Sold by:</span> <span id="cpSoldBy">—</span></div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div><span class="text-muted">Total:</span> UGX <span class="fw-semibold" id="cpTotal">0</span></div>
+                    <div><span class="text-muted">Paid:</span> UGX <span id="cpPaid">0</span></div>
+                    <div><span class="text-muted">Balance:</span> UGX <span class="fw-semibold" id="cpBalance">0</span></div>
+                  </div>
+                </div>
+
+                <div class="card border-0 bg-light">
+                  <div class="card-body">
+                    <div class="fw-semibold mb-2">Add Payment</div>
+                    <div class="row g-2 align-items-end">
+                      <div class="col-12 col-md-4">
+                        <label class="form-label small mb-1">Amount (UGX)</label>
+                        <input id="cpAmount" type="number" class="form-control" min="1" step="1" />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label small mb-1">Note (optional)</label>
+                        <input id="cpNote" class="form-control" placeholder="e.g. paid via cash" />
+                      </div>
+                      <div class="col-12 col-md-2 d-grid">
+                        <button class="btn btn-primary" id="btnAddPayment">Add</button>
+                      </div>
+                    </div>
+
+                    <div class="alert alert-danger d-none mt-3 mb-0" id="cpModalError"></div>
+                    <div class="alert alert-success d-none mt-3 mb-0" id="cpModalSuccess"></div>
+                  </div>
+                </div>
+
+                <hr class="my-3" />
+
+                <div class="fw-semibold mb-2">Payment History</div>
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Date</th>
+                        <th>Received By</th>
+                        <th class="text-end">Amount</th>
+                        <th>Note</th>
+                      </tr>
+                    </thead>
+                    <tbody id="cpPaymentsTable">
+                      <tr><td colspan="4" class="text-muted py-3">No payments yet.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
         </div>
+        <!-- Add User Modal -->
+        <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+              <div class="modal-header">
+                <h5 class="modal-title">Add User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
 
-        <div class="d-flex justify-content-end">
-          <div style="min-width: 280px;">
-            <div class="d-flex justify-content-between">
-              <span class="text-muted">Total</span>
-              <span class="fw-semibold">UGX <span id="svTotal">0</span></span>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span class="text-muted">Paid</span>
-              <span>UGX <span id="svPaid">0</span></span>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span class="text-muted">Balance</span>
-              <span>UGX <span id="svBalance">0</span></span>
+              <div class="modal-body">
+                <div class="mb-2">
+                  <label class="form-label small mb-1">Full name</label>
+                  <input id="auFullName" class="form-control" placeholder="e.g. Agent Two" />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label small mb-1">Username</label>
+                  <input id="auUsername" class="form-control" placeholder="e.g. agent2" />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label small mb-1">Password</label>
+                  <input id="auPassword" type="password" class="form-control" placeholder="Set password" />
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label small mb-1">Role</label>
+                  <select id="auRole" class="form-select">
+                    <option value="sales_agent">Sales Agent</option>
+                    <option value="director">Director</option>
+                    <option value="manager">Manager</option>
+                  </select>
+                  <div class="text-muted small mt-1">
+                    Tip: Usually only one manager account is needed.
+                  </div>
+                </div>
+
+                <div class="alert alert-danger d-none mt-3 mb-0" id="auError"></div>
+                <div class="alert alert-success d-none mt-3 mb-0" id="auSuccess"></div>
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" id="btnCreateUser">Create</button>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="alert alert-danger d-none mt-3 mb-0" id="svError"></div>
-      </div>
+        <section id="panel-payments" class="kgl-panel d-none">
+  <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+    <div>
+      <div class="fw-semibold">Credit Payments</div>
+      <div class="text-muted small">Track outstanding credit balances and receive payments</div>
+    </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-        <button class="btn btn-primary" id="btnOpenReceiptFromSale">Open Receipt</button>
+    <div class="d-flex gap-2 flex-wrap">
+      <input id="cpSearch" class="form-control form-control-sm" style="width: 240px;"
+             placeholder="Search customer / phone..." />
+      <button class="btn btn-sm btn-outline-primary" id="btnLoadCredits">Refresh</button>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-3">Date</th>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Sold By</th>
+              <th class="text-end">Total</th>
+              <th class="text-end">Paid</th>
+              <th class="text-end">Balance</th>
+              <th class="text-end pe-3">Action</th>
+            </tr>
+          </thead>
+          <tbody id="creditsTable">
+            <tr><td colspan="8" class="text-muted ps-3 py-4">Click refresh to load credit sales.</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
-</div>
-        <section id="panel-payments" class="kgl-panel d-none">
-          <div class="alert alert-info border-0">
-          </div>
+
+  <div class="alert alert-danger d-none mt-3 mb-0" id="creditsError"></div>
         </section>
 
+
         <section id="panel-users" class="kgl-panel d-none">
-          <div class="alert alert-info border-0">
-          </div>
+  <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+    <div>
+      <div class="fw-semibold">User Management</div>
+      <div class="text-muted small">Create accounts and manage access</div>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+      <input id="userSearch" class="form-control form-control-sm" style="width: 240px;"
+             placeholder="Search name / username..." />
+      <button class="btn btn-sm btn-outline-primary" id="btnLoadUsers">Refresh</button>
+      <button class="btn btn-sm btn-primary" id="btnOpenAddUser">Add user</button>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-3">Full Name</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th class="text-end pe-3">Action</th>
+            </tr>
+          </thead>
+          <tbody id="usersTable">
+            <tr><td colspan="5" class="text-muted ps-3 py-4">Click refresh to load users.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-danger d-none mt-3 mb-0" id="usersError"></div>
         </section>
+
 
         <section id="panel-manage-products" class="kgl-panel d-none">
           <div class="alert alert-info border-0">
@@ -608,5 +925,9 @@
   <script src="../js/products.js"></script>
   <script src="../js/sales.js"></script>
   <script src="../js/sales_list.js"></script>
+  <script src="../js/payments.js"></script>
+  <script src="../js/reports.js"></script>
+  <script src="../js/users.js"></script>
+
 </body>
 </html>

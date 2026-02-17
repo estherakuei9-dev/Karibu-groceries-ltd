@@ -50,6 +50,17 @@
     window.KGLSales?.init?.();
     window.KGLSalesList?.load?.();
     }
+    if (key === "payments") {
+    window.KGLPayments?.load?.();
+    }
+    if (key === "reports") {
+    window.KGLReports?.setDefaults?.();
+    window.KGLReports?.load?.();
+    }
+    if (key === "users") {
+      window.KGLUsers?.load?.();
+    }
+
     const map = {
       home: ["Dashboard", "Quick overview"],
       products: ["Products", "View available items"],

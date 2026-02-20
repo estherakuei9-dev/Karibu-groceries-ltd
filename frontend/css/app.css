@@ -4,6 +4,57 @@
 
   --bs-focus-ring-color: rgba(47, 158, 68, 0.25);
 }
+/* ===================================
+   Force Bootstrap Primary Buttons Green
+   =================================== */
+
+.btn-primary {
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+
+  --bs-btn-hover-bg: #2b8a3e;
+  --bs-btn-hover-border-color: #2b8a3e;
+
+  --bs-btn-active-bg: #237032;
+  --bs-btn-active-border-color: #237032;
+
+  --bs-btn-color: #fff;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-color: #fff;
+}
+
+/* ===================================
+   Green Outline Buttons
+   =================================== */
+
+.btn-outline-primary {
+  --bs-btn-color: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+
+  --bs-btn-hover-bg: var(--bs-primary);
+  --bs-btn-hover-border-color: var(--bs-primary);
+  --bs-btn-hover-color: #fff;
+
+  --bs-btn-active-bg: #2b8a3e;
+  --bs-btn-active-border-color: #2b8a3e;
+  --bs-btn-active-color: #fff;
+}
+/* ===================================
+   Custom Secondary Outline
+   =================================== */
+
+.btn-outline-secondary {
+  --bs-btn-color: #ffffff;
+  --bs-btn-border-color: #ffffff;
+
+  --bs-btn-hover-bg: #c92a2a;
+  --bs-btn-hover-border-color: #c92a2a;
+  --bs-btn-hover-color: #fff;
+
+  --bs-btn-active-bg: #a51111;
+  --bs-btn-active-border-color: #a51111;
+  --bs-btn-active-color: #fff;
+}
 
 body { background: #f7f7fb; }
 
@@ -128,6 +179,41 @@ body { background: #f7f7fb; }
   background: var(--bs-primary);
   box-shadow: 0 10px 25px rgba(0,0,0,0.25);
 }
+/* Login Logo */
+.kgl-login-logo {
+  height: 90px;
+  width: auto;
+  object-fit: contain;
+}
+/* Navbar Logo */
+.kgl-nav-logo {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+/* Navbar theme */
+.kgl-navbar {
+  background: linear-gradient(90deg, #1e5631, #2f7d44);
+  border-bottom: none;
+}
+
+.kgl-navbar .navbar-brand,
+.kgl-navbar .nav-link,
+.kgl-navbar .small,
+.kgl-navbar #navUser,
+.kgl-navbar #navRole {
+  color: #ffffff !important;
+}
+
+/* .kgl-navbar .btn-outline-secondary {
+  border-color: rgba(255,255,255,0.6);
+  color: #ffffff;
+}
+
+.kgl-navbar .btn-outline-secondary:hover {
+  background: #c92a2a;
+} */
+
 
 /* Inputs tuned for glass UI */
 .kgl-input{

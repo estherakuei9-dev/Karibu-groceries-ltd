@@ -52,6 +52,30 @@ const productEditForm = document.getElementById("productEditForm");
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
   }
+  const LOW_STOCK = 10;
+
+  function lowBadge(p) {
+    const qty = Number(p.stockQty || 0);
+    if (p.isActive !== false && qty <= LOW_STOCK) {
+      return ` <span class="badge text-bg-warning ms-2">LOW</span>`;
+    }
+    return "";
+  }
+
+  function updateLowStockUI(products) {
+    const low = (products || []).filter(p => (p.isActive !== false) && Number(p.stockQty || 0) <= LOW_STOCK);
+
+    const elCount = document.getElementById("lowStockCount");
+    const elTh = document.getElementById("lowStockThreshold");
+    if (elCount) elCount.textContent = low.length;
+    if (elTh) elTh.textContent = LOW_STOCK;
+
+    // Toast only for manager
+    if (role === "manager" && low.length > 0) {
+      window.KGL.ui.showToast(`${low.length} item(s) are low on stock`, "warning");
+    }
+  }
+
 
   function modalMsg(type, msg) {
   pmError.classList.add("d-none");
@@ -104,7 +128,7 @@ function setModalEditable(editable) {
     productsTable.innerHTML = list.map((p) => {
       return `
         <tr>
-          <td class="ps-3 fw-semibold">${escapeHtml(p.name)}</td>
+          <td class="ps-3 fw-semibold">${escapeHtml(p.name)}${lowBadge(p)}</td>
           <td>${escapeHtml(p.category || "-")}</td>
           <td>${escapeHtml(p.unit || "-")}</td>
           <td class="text-end">${money(p.sellingPrice)}</td>
@@ -116,6 +140,11 @@ function setModalEditable(editable) {
       `;
     }).join("");
   }
+  document.getElementById("btnViewLowStock")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  // click the sidebar menu link for Products
+  document.querySelector('#menu a[data-page="products"]')?.click();
+});
 
   async function loadProducts() {
     productsTable.innerHTML = `<tr><td colspan="6" class="text-muted ps-3 py-4">Loading...</td></tr>`;
@@ -123,13 +152,14 @@ function setModalEditable(editable) {
       const data = await window.KGL.api("/api/products");
       allProducts = data.products || [];
       applySearch();
+      updateLowStockUI(allProducts);
     } catch (err) {
       productsTable.innerHTML = `<tr><td colspan="6" class="text-danger ps-3 py-4">Failed: ${escapeHtml(err.message)}</td></tr>`;
     }
     // Exposed loader so dashboard can call it when switching panels
-window.KGLProducts = {
-  load: loadProducts,
-};
+    window.KGLProducts = {
+      load: loadProducts,
+    };
   }
 
   function applySearch() {

@@ -10,9 +10,13 @@
 <body>
 
   <!-- Top bar -->
-  <nav class="navbar navbar-expand-lg bg-white border-bottom">
+  <nav class="navbar navbar-expand-lg kgl-navbar">
     <div class="container-fluid">
-      <a class="navbar-brand fw-bold" href="../index.html">KGL</a>
+      <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+      <img src="../assets/login.png" alt="KGL Logo" class="kgl-nav-logo">
+      <span class="fw-bold">KGL</span>
+    </a>
+
 
       <div class="d-flex align-items-center gap-3">
         <div class="text-end">
@@ -85,12 +89,26 @@
                 </div>
               </div>
             </div>
+            <div class="col-12 col-md-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="text-muted small">Low Stock Items</div>
+              <div class="fw-bold fs-4"><span id="lowStockCount">0</span></div>
+              <div class="small text-muted">Threshold: ≤ <span id="lowStockThreshold">10</span></div>
+              <div class="small mt-2">
+                <a href="#" id="btnViewLowStock" class="text-decoration-none">View in Products</a>
+              </div>
+            </div>
           </div>
+                  </div>
+          </div>
+
 
           <div class="mt-4">
             <div class="alert alert-light border">
             </div>
           </div>
+          
         </section>
 
         <section id="panel-products" class="kgl-panel d-none">

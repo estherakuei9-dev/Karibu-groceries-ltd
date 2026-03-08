@@ -8,10 +8,10 @@ function num(v) {
 }
 
 async function recordSale(req, res) {
-  const session = await mongoose.startSession();
   try {
     const { items, saleType, customerName, customerPhone, amountPaidNow } = req.body;
 
+    // 1. Basic Validations
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ message: "items[] is required" });
     }
@@ -22,114 +22,65 @@ async function recordSale(req, res) {
       return res.status(400).json({ message: "customerName is required for credit sales" });
     }
 
-    // transaction: stock deduction + sale save
-    let saleDoc;
+    const saleItems = [];
+    let total = 0;
 
-    await session.withTransaction(async () => {
-      const saleItems = [];
-      let total = 0;
-
-      // Load and validate each product
-      for (const it of items) {
-        const productId = it.productId;
-        const qty = num(it.quantity);
-
-        if (!productId || !Number.isFinite(qty) || qty <= 0) {
-          throw new Error("INVALID_ITEM");
-        }
-
-        const product = await Product.findById(productId).session(session);
-        if (!product || !product.isActive) throw new Error("PRODUCT_NOT_FOUND");
-
-        if (product.stockQty < qty) {
-          const err = new Error("INSUFFICIENT_STOCK");
-          err.details = { product: product.name, available: product.stockQty, requested: qty };
-          throw err;
-        }
-
-        // Use product sellingPrice (backend source of truth)
-        const unitPrice = product.sellingPrice;
-        const lineTotal = unitPrice * qty;
-
-        // Deduct stock
-        product.stockQty = product.stockQty - qty;
-        await product.save({ session });
-
-        saleItems.push({
-          productId: product._id,
-          name: product.name,
-          quantity: qty,
-          unitPrice,
-          lineTotal,
-        });
-
-        total += lineTotal;
+    // 2. Validate all products first (ensure they exist and have stock)
+    for (const it of items) {
+      const product = await Product.findById(it.productId);
+      if (!product || !product.isActive) throw new Error("PRODUCT_NOT_FOUND");
+      
+      const qty = num(it.quantity);
+      if (!Number.isFinite(qty) || qty <= 0) throw new Error("INVALID_ITEM");
+      if (product.stockQty < qty) {
+        const err = new Error("INSUFFICIENT_STOCK");
+        err.details = { product: product.name, available: product.stockQty, requested: qty };
+        throw err;
       }
 
-      const paidInput = amountPaidNow === undefined ? 0 : num(amountPaidNow);
-      if (!Number.isFinite(paidInput) || paidInput < 0) throw new Error("INVALID_PAYMENT");
+      // Calculate totals
+      const lineTotal = product.sellingPrice * qty;
+      total += lineTotal;
+      
+      // Prepare item data
+      saleItems.push({
+        productId: product._id,
+        name: product.name,
+        quantity: qty,
+        unitPrice: product.sellingPrice,
+        lineTotal
+      });
+    }
 
-      let amountPaid = 0;
-      let balance = 0;
-      let paymentStatus = "paid";
+    // 3. Perform Updates (Sequential)
+    for (const it of items) {
+        await Product.findByIdAndUpdate(it.productId, { $inc: { stockQty: -num(it.quantity) } });
+    }
 
-      if (saleType === "cash") {
-        amountPaid = total;
-        balance = 0;
-        paymentStatus = "paid";
-      } else {
-        amountPaid = Math.min(paidInput, total);
-        balance = Math.max(total - amountPaid, 0);
-        paymentStatus = balance === 0 ? "paid" : amountPaid > 0 ? "partial" : "credit";
-      }
+    // 4. Calculate Payment
+    const paidInput = amountPaidNow === undefined ? 0 : num(amountPaidNow);
+    let amountPaid = (saleType === "cash") ? total : Math.min(paidInput, total);
+    let balance = (saleType === "cash") ? 0 : Math.max(total - amountPaid, 0);
+    let paymentStatus = balance === 0 ? "paid" : (amountPaid > 0 ? "partial" : "credit");
 
-      saleDoc = await Sale.create(
-        [
-          {
-            items: saleItems,
-            saleType,
-            totalAmount: total,
-            amountPaid,
-            balance,
-            paymentStatus,
-            customer:
-              saleType === "credit"
-                ? { name: String(customerName).trim(), phone: customerPhone ? String(customerPhone).trim() : "" }
-                : undefined,
-            soldBy: {
-              userId: req.user.sub,
-              username: req.user.username,
-              role: req.user.role,
-            },
-          },
-        ],
-        { session }
-      );
+    // 5. Create Sale Record
+    const saleDoc = await Sale.create({
+      items: saleItems,
+      saleType,
+      totalAmount: total,
+      amountPaid,
+      balance,
+      paymentStatus,
+      customer: saleType === "credit" ? { name: String(customerName).trim(), phone: customerPhone || "" } : undefined,
+      soldBy: { userId: req.user.sub, username: req.user.username, role: req.user.role },
     });
 
-    return res.status(201).json({
-      message: "Sale recorded",
-      sale: saleDoc[0],
-    });
+    return res.status(201).json({ message: "Sale recorded", sale: saleDoc });
+
   } catch (err) {
-    // Map known errors to friendly responses
-    if (err.message === "INVALID_ITEM") {
-      return res.status(400).json({ message: "Each item must have productId and quantity > 0" });
-    }
-    if (err.message === "PRODUCT_NOT_FOUND") {
-      return res.status(404).json({ message: "Product not found" });
-    }
-    if (err.message === "INVALID_PAYMENT") {
-      return res.status(400).json({ message: "Invalid amountPaidNow" });
-    }
-    if (err.message === "INSUFFICIENT_STOCK") {
-      return res.status(400).json({ message: "Insufficient stock", ...err.details });
-    }
-
+    // ... (Keep your existing error handling here) ...
     console.error(err);
-    return res.status(500).json({ message: "Server error" });
-  } finally {
-    session.endSession();
+    return res.status(500).json({ message: err.message || "Server error" });
   }
 }
 

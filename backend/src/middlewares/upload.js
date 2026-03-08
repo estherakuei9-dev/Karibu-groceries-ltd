@@ -3,8 +3,6 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // __dirname is .../backend/src/middlewares
-    // We go up two levels to reach 'backend/' then into 'public/uploads'
     const uploadPath = path.resolve(__dirname, "../../public/uploads");
     cb(null, uploadPath);
   },

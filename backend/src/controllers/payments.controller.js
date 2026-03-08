@@ -7,9 +7,7 @@ function num(v) {
   return Number.isFinite(n) ? n : NaN;
 }
 
-// POST /api/sales/:id/payments
 async function addPayment(req, res) {
-  const session = await mongoose.startSession();
   try {
     const saleId = req.params.id;
     const amount = num(req.body.amount);
@@ -19,81 +17,54 @@ async function addPayment(req, res) {
       return res.status(400).json({ message: "amount must be a number > 0" });
     }
 
-    let updatedSale;
-    let paymentDoc;
+    // 1. Find the sale
+    const sale = await Sale.findById(saleId);
+    if (!sale) return res.status(404).json({ message: "Sale not found" });
 
-    await session.withTransaction(async () => {
-      const sale = await Sale.findById(saleId).session(session);
-      if (!sale) throw new Error("SALE_NOT_FOUND");
+    // 2. Validate payment conditions
+    if (sale.saleType !== "credit") return res.status(400).json({ message: "Payments are only for credit sales" });
+    
+    if (req.user.role === "sales_agent" && String(sale.soldBy.userId) !== String(req.user.sub)) {
+      return res.status(403).json({ message: "Forbidden: insufficient role" });
+    }
 
-      // only credit sales should accept payments (cash is already paid)
-      if (sale.saleType !== "credit") throw new Error("NOT_CREDIT_SALE");
+    if (amount > sale.balance) {
+      return res.status(400).json({ message: "Payment exceeds remaining balance", balance: sale.balance });
+    }
 
-      // sales_agent can only add payment to their own sale (optional but realistic)
-      if (req.user.role === "sales_agent") {
-        if (String(sale.soldBy.userId) !== String(req.user.sub)) {
-          const err = new Error("FORBIDDEN");
-          throw err;
-        }
-      }
-
-      // cannot pay more than remaining balance
-      if (amount > sale.balance) {
-        const err = new Error("PAY_TOO_MUCH");
-        err.details = { balance: sale.balance };
-        throw err;
-      }
-
-      // create payment
-      paymentDoc = await Payment.create(
-        [
-          {
-            saleId: sale._id,
-            amount,
-            note,
-            receivedBy: {
-              userId: req.user.sub,
-              username: req.user.username,
-              role: req.user.role,
-            },
-          },
-        ],
-        { session }
-      );
-
-      // update sale totals
-      sale.amountPaid = sale.amountPaid + amount;
-      sale.balance = sale.totalAmount - sale.amountPaid;
-
-      if (sale.balance <= 0) {
-        sale.balance = 0;
-        sale.paymentStatus = "paid";
-      } else if (sale.amountPaid > 0) {
-        sale.paymentStatus = "partial";
-      } else {
-        sale.paymentStatus = "credit";
-      }
-
-      updatedSale = await sale.save({ session });
+    // 3. Create payment document
+    const paymentDoc = await Payment.create({
+      saleId: sale._id,
+      amount,
+      note,
+      receivedBy: {
+        userId: req.user.sub,
+        username: req.user.username,
+        role: req.user.role,
+      },
     });
+
+    // 4. Update sale totals
+    sale.amountPaid += amount;
+    sale.balance = sale.totalAmount - sale.amountPaid;
+
+    if (sale.balance <= 0) {
+      sale.balance = 0;
+      sale.paymentStatus = "paid";
+    } else {
+      sale.paymentStatus = "partial";
+    }
+
+    const updatedSale = await sale.save();
 
     return res.status(201).json({
       message: "Payment added",
-      payment: paymentDoc[0],
+      payment: paymentDoc,
       sale: updatedSale,
     });
   } catch (err) {
-    if (err.message === "SALE_NOT_FOUND") return res.status(404).json({ message: "Sale not found" });
-    if (err.message === "NOT_CREDIT_SALE") return res.status(400).json({ message: "Payments are only for credit sales" });
-    if (err.message === "FORBIDDEN") return res.status(403).json({ message: "Forbidden: insufficient role" });
-    if (err.message === "PAY_TOO_MUCH") {
-      return res.status(400).json({ message: "Payment exceeds remaining balance", ...err.details });
-    }
-
     console.error(err);
     return res.status(500).json({ message: "Server error" });
-  } finally {
-    session.endSession();
   }
 }
 

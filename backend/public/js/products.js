@@ -39,7 +39,40 @@ const pmSaveBtn = document.getElementById("pmSaveBtn");
 const pmMeta = document.getElementById("pmMeta");
 
 const productEditForm = document.getElementById("productEditForm");
+let inventoryChart; // Declare chart globally in the file
 
+function initInventoryChart(products) {
+  const ctx = document.getElementById('inventoryChart').getContext('2d');
+  
+  // Aggregate data: Group by category and multiply stock by sellingPrice
+  const stats = products.reduce((acc, p) => {
+    const cat = p.category || "Uncategorized";
+    const value = (Number(p.stockQty) || 0) * (Number(p.sellingPrice) || 0);
+    acc[cat] = (acc[cat] || 0) + value;
+    return acc;
+  }, {});
+
+  const data = {
+    labels: Object.keys(stats),
+    datasets: [{
+      label: 'Inventory Value (UGX)',
+      data: Object.values(stats),
+      backgroundColor: '#063925', // Your forest green
+      borderRadius: 5
+    }]
+  };
+
+  if (inventoryChart) {
+    inventoryChart.data = data;
+    inventoryChart.update();
+  } else {
+    inventoryChart = new Chart(ctx, {
+      type: 'bar',
+      data: data,
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+}
   function money(n) {
     return Number(n || 0).toLocaleString();
   }
@@ -119,27 +152,34 @@ function setModalEditable(editable) {
     addProductHint.textContent = "";
   }
 
-  function renderProducts(list) {
-    if (!list.length) {
-      productsTable.innerHTML = `<tr><td colspan="6" class="text-muted ps-3 py-4">No products found.</td></tr>`;
-      return;
-    }
-
-    productsTable.innerHTML = list.map((p) => {
-      return `
-        <tr>
-          <td class="ps-3 fw-semibold">${escapeHtml(p.name)}${lowBadge(p)}</td>
-          <td>${escapeHtml(p.category || "-")}</td>
-          <td>${escapeHtml(p.unit || "-")}</td>
-          <td class="text-end">${money(p.sellingPrice)}</td>
-          <td class="text-end">${money(p.stockQty)}</td>
-          <td class="text-end pe-3">
-            <button class="btn btn-sm btn-outline-secondary" data-view="${p._id}">View</button>
-          </td>
-        </tr>
-      `;
-    }).join("");
+  
+function renderProducts(list) {
+  if (!list.length) {
+    productsTable.innerHTML = `<tr><td colspan="7" class="text-muted ps-3 py-4">No products found.</td></tr>`;
+    return;
   }
+
+  productsTable.innerHTML = list.map((p) => {
+    // Construct the image URL. Ensure your backend returns the image path (e.g., "uploads/image.jpg")
+    const imgUrl = p.image ? (p.image.startsWith('/') ? p.image : `/${p.image}`) : '../assets/no-image.png'; // Fallback image
+
+    return `
+      <tr>
+        <td class="ps-3">
+          <img src="${imgUrl}" alt="${escapeHtml(p.name)}" class="rounded border" style="width: 40px; height: 40px; object-fit: cover;">
+        </td>
+        <td class="fw-semibold">${escapeHtml(p.name)}${lowBadge(p)}</td>
+        <td>${escapeHtml(p.category || "-")}</td>
+        <td>${escapeHtml(p.unit || "-")}</td>
+        <td class="text-end">${money(p.sellingPrice)}</td>
+        <td class="text-end">${money(p.stockQty)}</td>
+        <td class="text-end pe-3">
+          <button class="btn btn-sm btn-primary" data-view="${p._id}">View</button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
   document.getElementById("btnViewLowStock")?.addEventListener("click", (e) => {
   e.preventDefault();
   // click the sidebar menu link for Products
@@ -153,6 +193,7 @@ function setModalEditable(editable) {
       allProducts = data.products || [];
       applySearch();
       updateLowStockUI(allProducts);
+      if (typeof initInventoryChart === 'function') initInventoryChart(allProducts);
     } catch (err) {
       productsTable.innerHTML = `<tr><td colspan="6" class="text-danger ps-3 py-4">Failed: ${escapeHtml(err.message)}</td></tr>`;
     }
@@ -199,49 +240,51 @@ function setModalEditable(editable) {
   });
 
   addProductForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    clearMessages();
+  e.preventDefault();
+  clearMessages();
 
-    if (role !== "manager") {
-      showError("Only manager can add products.");
-      return;
-    }
+  if (role !== "manager") {
+    showError("Only manager can add products.");
+    return;
+  }
 
-    const payload = {
-      name: document.getElementById("pName").value.trim(),
-      category: document.getElementById("pCategory").value.trim(),
-      unit: document.getElementById("pUnit").value.trim(),
-      buyingPrice: Number(document.getElementById("pBuyingPrice").value),
-      sellingPrice: Number(document.getElementById("pSellingPrice").value),
-      stockQty: Number(document.getElementById("pStockQty").value),
-    };
+  // Use FormData to handle the image file
+  const formData = new FormData();
+  formData.append("name", document.getElementById("pName").value.trim());
+  formData.append("category", document.getElementById("pCategory").value.trim());
+  formData.append("unit", document.getElementById("pUnit").value.trim());
+  formData.append("buyingPrice", document.getElementById("pBuyingPrice").value);
+  formData.append("sellingPrice", document.getElementById("pSellingPrice").value);
+  formData.append("stockQty", document.getElementById("pStockQty").value);
 
-    btnCreateProduct.disabled = true;
-    btnCreateProduct.textContent = "Creating...";
-    addProductHint.textContent = "Saving product...";
+  const imageFile = document.getElementById("pImage").files[0];
+  if (imageFile) {
+    formData.append("image", imageFile); // 'image' must match your Multer upload.single('image') name
+  }
 
-    try {
-      const data = await window.KGL.api("/api/products", {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
+  btnCreateProduct.disabled = true;
+  btnCreateProduct.textContent = "Creating...";
 
-      showSuccess("Product created successfully.");
-      window.KGL.ui.showToast("Product added", "success");
+  try {
+    // IMPORTANT: When sending FormData, do NOT set Content-Type header manually.
+    // The browser will set it to multipart/form-data with the correct boundary.
+    const data = await window.KGL.api("/api/products", {
+      method: "POST",
+      body: formData, // Send the FormData object directly
+    });
 
-      addProductForm.reset();
-      addProductCard.classList.add("d-none");
-
-      // reload list
-      await loadProducts();
-    } catch (err) {
-      showError(err.message || "Failed to create product.");
-    } finally {
-      btnCreateProduct.disabled = false;
-      btnCreateProduct.textContent = "Create Product";
-      addProductHint.textContent = "";
-    }
-  });
+    showSuccess("Product created successfully.");
+    window.KGL.ui.showToast("Product added", "success");
+    addProductForm.reset();
+    addProductCard.classList.add("d-none");
+    await loadProducts();
+  } catch (err) {
+    showError(err.message || "Failed to create product.");
+  } finally {
+    btnCreateProduct.disabled = false;
+    btnCreateProduct.textContent = "Create Product";
+  }
+});
 
   // View action
   productsTable?.addEventListener("click", async (e) => {
@@ -254,6 +297,20 @@ function setModalEditable(editable) {
     modalMsg("", "");
     const data = await window.KGL.api(`/api/products/${id}`);
     const p = data.product;
+    // Image Preview Logic
+    const pmPreview = document.getElementById("pmPreview");
+    const pmImageUploadContainer = document.getElementById("pmImageUploadContainer");
+
+    if (p.image) {
+      pmPreview.src = p.image; 
+      pmPreview.style.display = "inline-block";
+    } else {
+      pmPreview.style.display = "none";
+    }
+
+    if (role === 'manager') {
+      pmImageUploadContainer?.classList.remove("d-none");
+    }
 
     pmId.value = p._id;
     pmTitle.textContent = p.name || "Product";
@@ -287,44 +344,41 @@ pmSaveBtn?.addEventListener("click", async () => {
 
   const id = pmId.value;
 
-  const Payload = {
-  name: pmName.value.trim(),
-  category: pmCategory.value.trim(),
-  unit: pmUnit.value.trim(),
-  buyingPrice: Number(pmBuyingPrice.value),
-  sellingPrice: Number(pmSellingPrice.value),
-  isActive: pmIsActive.value === "true",
-    };
-
-    const stockValue = Number(pmStockQty.value);
-
   try {
-    try {
-      await window.KGL.api(`/api/products/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(Payload),
-      });
-      
-        await window.KGL.api(`/api/products/${id}/stock`, {
-        method: "PATCH",
-        body: JSON.stringify({ set: stockValue }),
-        });
-    } catch (err) {
-      if (err.status === 404 || err.status === 405) {
-        await window.KGL.api(`/api/products/${id}`, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        });
-      } else {
-        throw err;
-      }
+    // 1. Prepare FormData instead of a JSON Payload
+    const formData = new FormData();
+    formData.append("name", pmName.value.trim());
+    formData.append("category", pmCategory.value.trim());
+    formData.append("unit", pmUnit.value.trim());
+    formData.append("buyingPrice", Number(pmBuyingPrice.value));
+    formData.append("sellingPrice", Number(pmSellingPrice.value));
+    formData.append("isActive", pmIsActive.value === "true");
+
+    // Get the file from the new input we added to the modal
+    const imageFile = document.getElementById("pmImage").files[0];
+    if (imageFile) {
+      formData.append("image", imageFile);
     }
+
+    // 2. Update Product Details & Image
+    // Note: We pass formData directly as the body. 
+    // Do NOT use JSON.stringify here.
+    await window.KGL.api(`/api/products/${id}`, {
+      method: "PATCH",
+      body: formData,
+    });
+
+    // 3. Update Stock (We can keep this as JSON)
+    const stockValue = Number(pmStockQty.value);
+    await window.KGL.api(`/api/products/${id}/stock`, {
+      method: "PATCH",
+      body: JSON.stringify({ set: stockValue }),
+    });
 
     modalMsg("success", "Changes saved.");
     window.KGL.ui.showToast("Product updated", "success");
-
-    // Refresh list
     await loadProducts();
+    productModal?.hide();
   } catch (err) {
     modalMsg("error", err.message || "Failed to update product.");
   } finally {

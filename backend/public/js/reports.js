@@ -61,16 +61,23 @@
   }
 
   function setTodayRangeDefault() {
-    // default last 7 days for nice demo
-    const now = new Date();
-    const to = now.toISOString().slice(0, 10);
-    const fromDate = new Date(now);
-    fromDate.setDate(fromDate.getDate() - 7);
-    const from = fromDate.toISOString().slice(0, 10);
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  
+  // Set 'to' as today's date (YYYY-MM-DD)
+  const to = now.toISOString().slice(0, 10);
+  
+  // Set 'from' as January 1st of the current year
+  const from = `${currentYear}-01-01`;
 
-    if (repFrom && !repFrom.value) repFrom.value = from;
-    if (repTo && !repTo.value) repTo.value = to;
+  if (repFrom && !repFrom.value) repFrom.value = from;
+  if (repTo && !repTo.value) repTo.value = to;
+  
+  // Optional: Trigger the reports load so data appears immediately
+  if (typeof loadReports === 'function') {
+    loadReports();
   }
+}
 
   async function loadSummary() {
     const q = buildRangeQuery();
@@ -87,6 +94,15 @@
     // some versions of your backend summary may not include counts.
     repCashCount.textContent = money(s.cashCount || 0);
     repCreditCount.textContent = money(s.creditCount || 0);
+    if (typeof initSalesRatioChart === 'function') {
+        // Ensure values are numbers
+        const cash = Number(s.cashSales || 0);
+        const credit = Number(s.creditSales || 0);
+        console.log("Passing to chart - Cash:", cash, "Credit:", credit);
+        initSalesRatioChart(cash, credit);
+    } else {
+        console.error("initSalesRatioChart function not found!");
+    }
   }
 
   async function loadStock() {

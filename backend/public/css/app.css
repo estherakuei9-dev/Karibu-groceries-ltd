@@ -43,7 +43,13 @@
    Custom Secondary Outline
    =================================== */
 
-.btn-outline-secondary {
+.btn-outline-secondary{
+  --bs-btn-hover-bg: #c92a2a;
+  --bs-btn-hover-border-color: #c92a2a;
+  --bs-btn-hover-color: #fff;
+
+}
+.btn-logout{
   --bs-btn-color: #ffffff;
   --bs-btn-border-color: #ffffff;
 
@@ -205,16 +211,6 @@ body { background: #f7f7fb; }
   color: #ffffff !important;
 }
 
-/* .kgl-navbar .btn-outline-secondary {
-  border-color: rgba(255,255,255,0.6);
-  color: #ffffff;
-}
-
-.kgl-navbar .btn-outline-secondary:hover {
-  background: #c92a2a;
-} */
-
-
 /* Inputs tuned for glass UI */
 .kgl-input{
   background: rgba(255,255,255,0.90);
@@ -246,4 +242,33 @@ body { background: #f7f7fb; }
   --bs-btn-color: #fff;
   --bs-btn-hover-color: #fff;
   --bs-btn-active-color: #fff;
+}
+/* Apply green borders to all inputs and select boxes */
+.form-control, 
+.form-select {
+  border-color: #ced4da; /* Default border color */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Change border and add a green glow when the input is clicked (focus) */
+.form-control:focus, 
+.form-select:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+  outline: 0;
+}
+
+/* If you want the borders to be green even when not focused */
+.form-control, 
+.form-select {
+  border-color: rgba(47, 158, 68, 0.3); /* Subtle green border by default */
+}
+#menu .list-group-item:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+#menu .list-group-item.active {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-left: 4px solid #4ade80 !important; /* A light green accent line */
 }

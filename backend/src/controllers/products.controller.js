@@ -22,14 +22,15 @@ async function createProduct(req, res) {
     if (!Number.isFinite(bp) || bp < 0) return res.status(400).json({ message: "Invalid buyingPrice" });
     if (!Number.isFinite(sq) || sq < 0) return res.status(400).json({ message: "Invalid stockQty" });
 
-    const product = await Product.create({
-      name: String(name).trim(),
-      category: category ? String(category).trim() : undefined,
-      unit: unit ? String(unit).trim() : "kg",
-      sellingPrice: sp,
-      buyingPrice: bp,
-      stockQty: sq,
-    });
+  const product = await Product.create({
+    name: String(name).trim(),
+    category: category ? String(category).trim() : undefined,
+    unit: unit ? String(unit).trim() : "kg",
+    sellingPrice: sp,
+    buyingPrice: bp,
+    stockQty: sq,
+    image: req.file ? `/uploads/${req.file.filename}` : null,
+  });
 
     return res.status(201).json({ message: "Product created", product });
   } catch (err) {
@@ -86,6 +87,10 @@ async function updateProduct(req, res) {
       updates.buyingPrice = bp;
     }
 
+    if (req.file) {
+      updates.image = `/uploads/${req.file.filename}`;
+    }
+    
     const product = await Product.findByIdAndUpdate(req.params.id, updates, { new: true });
     if (!product) return res.status(404).json({ message: "Product not found" });
 

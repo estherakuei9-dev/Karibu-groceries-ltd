@@ -48,11 +48,15 @@
   }
 
   async function api(path, options = {}) {
-    const headers = Object.assign(
-      { "Content-Type": "application/json" },
-      options.headers || {}
-    );
-
+    const isFormData = options.body instanceof FormData;
+    
+    // Create headers object
+    const headers = { ...options.headers };
+    
+    // Only set Content-Type to JSON if it's NOT FormData
+    if (!isFormData) {
+      headers["Content-Type"] = "application/json";
+    }
     const token = getToken();
     if (token) headers.Authorization = `Bearer ${token}`;
 

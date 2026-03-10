@@ -90,10 +90,10 @@
           <td>${escapeHtml(u.role || "-")}</td>
           <td>${badge(active)}</td>
           <td class="text-end pe-3">
-            <button class="btn btn-sm ${u.isActive ? 'btn-outline-danger' : 'btn-outline-success'}" 
-                  data-toggle-user="${u._id}">
-            <i class="bi ${u.isActive ? 'bi-person-x' : 'bi-person-check'}"></i>
-            ${u.isActive ? 'Disable' : 'Enable'}
+            <button class="btn btn-sm ${active ? 'btn-outline-danger' : 'btn-outline-success'}" 
+                  data-toggle-user="${u.id}">
+            <i class="bi ${active ? 'bi-person-x' : 'bi-person-check'}"></i>
+            ${active ? 'Disable' : 'Enable'}
           </button>
           </td>
         </tr>
@@ -115,24 +115,18 @@
     }
   }
 
-  async function toggleUser(id) {
+ async function toggleUser(id) {
+  if (!id) {
+    console.error("No ID provided to toggleUser");
+    return;
+  }
+  
   try {
-    // 1. Send the PATCH request to the new route you just created
-    await window.KGL.api(`/api/users/${id}/toggle`, {
-      method: "PATCH",
-    });
-
-    // 2. IMPORTANT: Reload the users from the database 
-    // This updates the internal 'users' array and re-renders the table
-    await loadUsers();
-
-    // 3. Show a nice success notification
-    if (window.KGL.ui && window.KGL.ui.showToast) {
-      window.KGL.ui.showToast("User status updated", "success");
-    }
+    await window.KGL.api(`/api/users/${id}/toggle`, { method: "PATCH" });
+    await loadUsers(); // This re-fetches data from the server and re-runs renderUsers()
+    window.KGL.ui?.showToast?.("User status updated", "success");
   } catch (err) {
-    console.error("Toggle failed:", err);
-    showErr(err.message || "Failed to update user status.");
+    showErr(err.message || "Failed to update status.");
   }
 }
 

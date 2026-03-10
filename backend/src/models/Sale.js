@@ -37,6 +37,7 @@ const saleSchema = new mongoose.Schema(
     branch: {
     type: String,
     required: true,
+    trim: true,
     index: true
   },
   },

@@ -9,7 +9,6 @@
 
   const inputUsername = document.getElementById("username");
   const inputPassword = document.getElementById("password");
-  const inputBranch = document.getElementById("branch");
   const btnLogin = document.getElementById("btnLogin");
   const errorBox = document.getElementById("errorBox");
 
@@ -29,10 +28,9 @@
 
     const username = (inputUsername.value || "").trim();
     const password = inputPassword.value || "";
-    const branch = inputBranch.value;
 
-    if (!username || !password || !branch) {
-      setError("Please enter username, password and branch.");
+    if (!username || !password) {
+      setError("Please enter username and password.");
       return;
     }
 
@@ -42,7 +40,7 @@
     try {
       const data = await window.KGL.api("/api/auth/login", {
         method: "POST",
-          body: JSON.stringify({ username, password, branch }),      });
+          body: JSON.stringify({ username, password }),      });
 
       window.KGL.auth.setSession(data.token, data.user);
       window.KGL.auth.roleRedirect(data.user);

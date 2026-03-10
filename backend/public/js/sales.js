@@ -5,6 +5,7 @@
   // Allow manager + sales_agent to record sales
   if (!["manager", "sales_agent"].includes(role)) return;
 
+  const saleBranch = document.getElementById("saleBranch");
   const saleProduct = document.getElementById("saleProduct");
   const saleProductMeta = document.getElementById("saleProductMeta");
   const saleQty = document.getElementById("saleQty");
@@ -317,7 +318,15 @@ const receiptArea = document.getElementById("receiptArea");
     if (!cart.length) return showMsg("error", "Cart is empty.");
     const saleType = getSaleType();
 
+    const branch = saleBranch.value;
+
+    if (!branch) {
+      showMsg("error", "Please select a branch before recording the sale.");
+      return;
+    }
+
     const payload = {
+      branch,
       saleType,
       items: cart.map((i) => ({ productId: i.productId, quantity: i.quantity })),
     };
@@ -349,6 +358,7 @@ const receiptArea = document.getElementById("receiptArea");
       cart = [];
       renderCart();
       saleQty.value = 1;
+      saleBranch.value = "";
       customerName.value = "";
       customerPhone.value = "";
       amountPaidNow.value = 0;

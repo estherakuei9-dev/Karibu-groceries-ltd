@@ -9,7 +9,7 @@ function num(v) {
 
 async function recordSale(req, res) {
   try {
-    const { items, saleType, customerName, customerPhone, amountPaidNow } = req.body;
+    const { items, saleType, customerName, customerPhone, amountPaidNow, branch } = req.body;
 
     // 1. Basic Validations
     if (!Array.isArray(items) || items.length === 0) {
@@ -66,6 +66,7 @@ async function recordSale(req, res) {
     // 5. Create Sale Record
     const saleDoc = await Sale.create({
       items: saleItems,
+      branch,
       saleType,
       totalAmount: total,
       amountPaid,
@@ -91,7 +92,7 @@ async function listSales(req, res) {
     const { from, to, saleType, soldBy } = req.query;
 
     const filter = {};
-    filter.branch = req.user.branch;
+    filter.branch = req.body.branch || undefined;
 
     // Directors/Managers can see everything.
     // Sales agents should only see their own sales.

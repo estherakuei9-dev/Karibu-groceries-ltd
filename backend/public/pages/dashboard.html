@@ -123,7 +123,7 @@
             <div class="card-body">
               <div class="text-muted small"> <i class="bi bi-graph-down-arrow text-success"></i> Low Stock Items</div>
               <div class="fw-bold fs-4"><span id="lowStockCount">0</span></div>
-              <div class="small text-muted">Threshold: ≤ <span id="lowStockThreshold">10</span></div>
+              <div class="small text-muted"> <span id="lowStockThreshold">10</span></div>
               <div class="small mt-2">
                 <a href="#" id="btnViewLowStock" class="text-decoration-none">View in Products</a>
               </div>
@@ -464,7 +464,6 @@
           <div class="d-flex align-items-center justify-content-between mb-2">
             <div>
               <div class="fw-semibold">Record Sale</div>
-              <div class="text-muted small">Add items, choose cash/credit, submit</div>
             </div>
             <button class="btn btn-sm btn-outline-primary" id="btnReloadSaleProducts">
               Reload products
@@ -550,12 +549,12 @@
           <div id="creditFields" class="d-none">
             <div class="mb-2">
               <label class="form-label small mb-1">Customer name</label>
-              <input id="customerName" class="form-control" placeholder="e.g. John Kato" />
+              <input id="customerName" class="form-control" placeholder="Customer name" />
             </div>
 
             <div class="mb-2">
               <label class="form-label small mb-1">Customer phone</label>
-              <input id="customerPhone" class="form-control" placeholder="e.g. 0700..." />
+              <input id="customerPhone" class="form-control" placeholder="Customer phone" />
             </div>
 
             <div class="mb-2">
@@ -575,7 +574,6 @@
           </button>
 
           <div class="text-muted small mt-2">
-            Tip: Stock reduces automatically after successful sale.
           </div>
         </div>
       </div>
@@ -822,7 +820,7 @@
                       </div>
                       <div class="col-12 col-md-6">
                         <label class="form-label small mb-1">Note (optional)</label>
-                        <input id="cpNote" class="form-control" placeholder="e.g. paid via cash" />
+                        <input id="cpNote" class="form-control" placeholder=" paid via cash" />
                       </div>
                       <div class="col-12 col-md-2 d-grid">
                         <button class="btn btn-primary" id="btnAddPayment">Add</button>
@@ -872,12 +870,12 @@
               <div class="modal-body">
                 <div class="mb-2">
                   <label class="form-label small mb-1">Full name</label>
-                  <input id="auFullName" class="form-control" placeholder="e.g. Agent Two" />
+                  <input id="auFullName" class="form-control" placeholder="full name" />
                 </div>
 
                 <div class="mb-2">
                   <label class="form-label small mb-1">Username</label>
-                  <input id="auUsername" class="form-control" placeholder="e.g. agent2" />
+                  <input id="auUsername" class="form-control" placeholder=" agent2" />
                 </div>
 
                 <div class="mb-2">

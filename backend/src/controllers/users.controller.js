@@ -68,6 +68,7 @@ async function listUsers(req, res) {
 // PATCH /api/users/:id/toggle
 async function toggleUser(req, res) {
   try {
+    console.log("Searching for user with ID:", req.params.id);
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -80,7 +81,7 @@ async function toggleUser(req, res) {
       user: sanitizeUser(user) 
     });
   } catch (err) {
-    console.error(err);
+    console.error("Database error in toggleUser:", err);
     return res.status(500).json({ message: "Server error" });
   }
 }

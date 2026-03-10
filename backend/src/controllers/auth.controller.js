@@ -3,10 +3,10 @@ const { User } = require("../models/User");
 
 async function login(req, res) {
   try {
-    const { username, password, branch } = req.body;
+    const { username, password } = req.body;
 
-    if (!username || !password || !branch) {
-      return res.status(400).json({ message: "username, password and branch are required" });
+    if (!username || !password) {
+      return res.status(400).json({ message: "username and password are required" });
     }
 
     const user = await User.findOne({ username: String(username).toLowerCase().trim() });
@@ -18,7 +18,7 @@ async function login(req, res) {
     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
 
     const token = jwt.sign(
-      { sub: user._id.toString(), role: user.role, username: user.username, branch: branch },
+      { sub: user._id.toString(), role: user.role, username: user.username },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
     );
@@ -30,7 +30,6 @@ async function login(req, res) {
         fullName: user.fullName,
         username: user.username,
         role: user.role,
-        branch: branch
       },
     });
   } catch (err) {

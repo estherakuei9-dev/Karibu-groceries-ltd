@@ -10,6 +10,7 @@
   document.getElementById("navRole").textContent = window.KGL.ui.formatRole(role) || "—";
   document.getElementById("cardUser").textContent = user?.fullName ? `${user.fullName} (${user.username})` : (user?.username || "—");
   document.getElementById("cardRole").textContent = window.KGL.ui.formatRole(role) || "—";
+  document.getElementById("cardBranch").textContent = user.branch || "—";
 
   // Logout
   document.getElementById("btnLogout").addEventListener("click", () => window.KGL.auth.logout());

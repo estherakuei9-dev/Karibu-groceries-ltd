@@ -33,6 +33,12 @@ const saleSchema = new mongoose.Schema(
       username: { type: String, required: true },
       role: { type: String, required: true },
     },
+    
+    branch: {
+    type: String,
+    required: true,
+    index: true
+  },
   },
   { timestamps: true }
 );

@@ -65,4 +65,23 @@ async function listUsers(req, res) {
   }
 }
 
-module.exports = { createUser, listUsers };
+// PATCH /api/users/:id/toggle
+async function toggleUser(req, res) {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Flip the status: if true becomes false, if false becomes true
+    user.isActive = !user.isActive;
+    await user.save();
+
+    return res.json({ 
+      message: `User ${user.isActive ? 'enabled' : 'disabled'}`, 
+      user: sanitizeUser(user) 
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+module.exports = { createUser, listUsers,toggleUser };

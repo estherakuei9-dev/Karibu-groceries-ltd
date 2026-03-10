@@ -87,7 +87,7 @@ async function recordSale(req, res) {
 
 async function listSales(req, res) {
   try {
-    const { from, to, saleType, soldBy } = req.query;
+    const { from, to, saleType, soldBy,branch } = req.query;
 
     const filter = {};
     if (branch) filter.branch = branch;

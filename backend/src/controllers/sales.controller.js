@@ -72,7 +72,6 @@ async function recordSale(req, res) {
       amountPaid,
       balance,
       paymentStatus,
-      branch: req.user.branch,
       customer: saleType === "credit" ? { name: String(customerName).trim(), phone: customerPhone || "" } : undefined,
       soldBy: { userId: req.user.sub, username: req.user.username, role: req.user.role },
     });
@@ -86,20 +85,16 @@ async function recordSale(req, res) {
   }
 }
 
-// GET /api/sales
 async function listSales(req, res) {
   try {
     const { from, to, saleType, soldBy } = req.query;
 
     const filter = {};
-    filter.branch = req.body.branch || undefined;
+    if (branch) filter.branch = branch;
 
-    // Directors/Managers can see everything.
-    // Sales agents should only see their own sales.
     if (req.user.role === "sales_agent") {
       filter["soldBy.userId"] = req.user.sub;
     } else {
-      // Optional: manager/director can filter by soldBy userId
       if (soldBy) filter["soldBy.userId"] = soldBy;
     }
 
@@ -131,9 +126,6 @@ async function getSale(req, res) {
   try {
     const sale = await Sale.findById(req.params.id);
     if (!sale) return res.status(404).json({ message: "Sale not found" });
-    if (sale.branch !== req.user.branch) {
-    return res.status(403).json({ message: "Forbidden: wrong branch" });
-  }
 
     // sales_agent can only view their own sale
     if (req.user.role === "sales_agent") {

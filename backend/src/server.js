@@ -13,7 +13,7 @@ const reportsRoutes = require("./routes/reports.routes");
 
 const app = express();
 app.use(cors());
-// Increase the limit to 10MB to accommodate images
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
@@ -30,7 +30,6 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 app.use("/uploads", express.static(path.join(__dirname, "..", "public", "uploads")));
 
 const port = process.env.PORT || 3000;
-
 connectDB()
   .then(() => {
     app.listen(port, () => console.log(`Server running on port ${port}`));

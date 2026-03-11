@@ -1,5 +1,7 @@
 (function () {
-  const BASE_URL = "";
+  const BASE_URL = window.location.hostname === "localhost"
+    ? "http://localhost:3000"
+    : "";
 
   const STORAGE_KEYS = {
     token: "kgl_token",
